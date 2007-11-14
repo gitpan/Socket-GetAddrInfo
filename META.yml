@@ -1,0 +1,14 @@
+---
+name: Socket-GetAddrInfo
+version: 0.01
+author:
+  - 'Paul Evans E<lt>leonerd@leonerd.org.ukE<gt>'
+abstract: "a wrapper for Socket6's getaddrinfo() and getaddrinfo(), or emulation"
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Socket::GetAddrInfo:
+    file: lib/Socket/GetAddrInfo.pm
+    version: 0.01
+generated_by: Module::Build version 0.26
