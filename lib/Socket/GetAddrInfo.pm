@@ -23,7 +23,7 @@ our @EXPORT = qw(
    NI_DGRAM
 );
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Carp;
 
@@ -237,8 +237,11 @@ sub _fake_getnameinfo
 {
    my ( $addr, $flags ) = @_;
 
-   my $family = Socket::sockaddr_family( $addr );
-   $family == Socket::AF_INET() or croak "Cannot emulate getnameinfo() on family $family";
+   my ( $port, $inetaddr );
+   eval { ( $port, $inetaddr ) = Socket::unpack_sockaddr_in( $addr ) }
+      or croak "Cannot emulate getnameinfo() on socket family != AF_INET";
+
+   my $family = Socket::AF_INET();
 
    $flags ||= 0;
 
@@ -249,7 +252,6 @@ sub _fake_getnameinfo
 
    $flags == 0 or croak sprintf "Cannot emulate getnameinfo() with unknown flags 0x%x", $flags;
 
-   my ( $port, $inetaddr ) = Socket::unpack_sockaddr_in( $addr );
 
    my $node;
    if( $flag_numerichost ) {

@@ -5,7 +5,6 @@ WriteMakefile
           'NAME' => 'Socket::GetAddrInfo',
           'VERSION_FROM' => 'lib/Socket/GetAddrInfo.pm',
           'PREREQ_PM' => {
-                           'Socket' => '1.75',
                            'Test::More' => '0'
                          },
           'INSTALLDIRS' => 'site',
