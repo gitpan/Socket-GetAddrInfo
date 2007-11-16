@@ -29,7 +29,7 @@ sub do_test_getaddrinfo
          print "Name not known - $node\n";
       }
       elsif( @expect == 1 ) {
-         skip "Resolve error $expect[0] - $node", 1 unless $failure_OK;
+         skip "Resolve error $expect[0] - $node", 2 unless $failure_OK;
          my $expect_fail = $expect[0];
 
          my @addrinfo = getaddrinfo( $node, $service );

@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.04    BUGFIXES:
+         * Declare dependency on Test::Exception
+         * Fixed skip count in test in 01getaddrinfo-socket6.t
+
 0.03    CHANGES:
          * Changed getnameinfo() to avoid needing sockaddr_family(), which
            avoids a version check, which means it works on perl 5.6.1
