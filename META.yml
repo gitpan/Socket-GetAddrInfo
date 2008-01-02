@@ -1,11 +1,11 @@
 ---
 name: Socket-GetAddrInfo
-version: 0.04
+version: 0.05
 author:
   - 'Paul Evans E<lt>leonerd@leonerd.org.ukE<gt>'
 abstract: |-
   a wrapper for Socket6's C<getaddrinfo> and
-  C<getaddrinfo>, or emulation for platforms that do not support it
+  C<getnameinfo>, or emulation for platforms that do not support it
 license: perl
 resources:
   license: http://dev.perl.org/licenses/
@@ -15,7 +15,7 @@ build_requires:
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.04
+    version: 0.05
 generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

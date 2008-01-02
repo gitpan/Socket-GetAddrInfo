@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007,2008 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo;
 
@@ -23,14 +23,14 @@ our @EXPORT = qw(
    NI_DGRAM
 );
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp;
 
 =head1 NAME
 
 C<Socket::GetAddrInfo> - a wrapper for Socket6's C<getaddrinfo> and
-C<getaddrinfo>, or emulation for platforms that do not support it
+C<getnameinfo>, or emulation for platforms that do not support it
 
 =head1 SYNOPSIS
 
@@ -45,8 +45,10 @@ C<getaddrinfo>, or emulation for platforms that do not support it
     my ( $family, $socktype, $proto, $addr, $canonname ) = splice @res, 0, 5;
 
     $sock = IO::Socket->new();
-    $sock->socket( $family, $socktype, $proto ) or next;
-    $sock->connect( $addr ) or next;
+    $sock->socket( $family, $socktype, $proto ) or undef $sock, next;
+    $sock->connect( $addr ) or undef $sock, next;
+
+    last;
  }
 
  if( $sock ) {
@@ -56,17 +58,28 @@ C<getaddrinfo>, or emulation for platforms that do not support it
 
 =head1 DESCRIPTION
 
-This module provides access to the C<getaddrinfo> and C<getnameinfo> functions
-of L<Socket6> on systems that have C<Socket6> installed, or provides
-emulations of them using the "legacy" functions such as C<gethostbyname()> on
-systems that do not.
+The intention of this module is that any code wishing to perform
+name-to-address or address-to-name resolutions should use this instead of
+using C<Socket6> directly. If the underlying platform has C<Socket6>
+installed, then it will be used, and the complete range of features it
+provides can be used. If the platform does not support it, then this module
+will instead provide emulations of the relevant functions, using the legacy
+resolver functions of C<gethostbyname()>, etc... 
 
-These emulations are not a complete replacement of C<Socket6>, because they
-only support IPv4 (the C<AF_INET> socket family). They do, however, implement
-the same interface as the C<Socket6> functions, so any code written to use
-this module can be used on systems that do not support C<Socket6>, but will
-automatically make use of the extended abilities of C<Socket6> on systems that
-do support it.
+These emulations support the same interface as the real C<Socket6> functions,
+and behave as close as is resonably possible to emulate using the legacy
+functions. See below for details on the limits of this emulation.
+
+Any existing code that already uses C<Socket6> to do this can simply change
+
+ use Socket6 qw( getaddrinfo );
+
+into
+
+ use Socket::GetAddrInfo qw( getaddrinfo );
+
+and require no further changes, in order to be backward-compatible with older
+machines that do not or cannot support C<Socket6>.
 
 =cut
 
@@ -108,6 +121,9 @@ my $REGEXP_IPv4_DECIMAL = qr/25[0-5]|2[0-4][0-9]|1?[0-9][0-9]{1,2}/;
 my $REGEXP_IPv4_DOTTEDQUAD = qr/$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL/;
 
 =head1 LIMITS OF EMULATION
+
+These emulations are not a complete replacement of C<Socket6>, because they
+only support IPv4 (the C<AF_INET> socket family).
 
 =cut
 
@@ -221,8 +237,8 @@ sub _fake_getaddrinfo
 
 =item *
 
-If the sockaddr family of C<$addr> is C<AF_INET>, an error will be thrown with
-C<croak>.
+If the sockaddr family of C<$addr> is anything other than C<AF_INET>, an error
+will be thrown with C<croak>.
 
 =item *
 

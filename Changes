@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.05    CHANGES:
+         * Reworded DESCRIPTION section of documentation
+         * Fixed some bugs in the SYNOPSIS example
+
 0.04    BUGFIXES:
          * Declare dependency on Test::Exception
          * Fixed skip count in test in 01getaddrinfo-socket6.t

@@ -24,7 +24,7 @@ sub do_test_getaddrinfo
                           : 0;
 
       if( $node and @addrs == 0 ) {
-         skip "Resolve error on name $node", 1 unless $failure_OK;
+         skip "Resolve error on name $node", 5 unless $failure_OK;
          my $expect_fail = "Name or service not known";
 
          my @addrinfo = getaddrinfo( $node, $service );
@@ -35,7 +35,7 @@ sub do_test_getaddrinfo
          ok( 1, "dummy space filler" ) foreach 1 .. 3;
       }
       elsif( $service and !defined $port ) {
-         skip "Resolve error on service $service", 1 unless $failure_OK;
+         skip "Resolve error on service $service", 5 unless $failure_OK;
          my $expect_fail = "Servname not supported for ai_socktype";
 
          my @addrinfo = getaddrinfo( $node, $service );
