@@ -23,7 +23,7 @@ our @EXPORT = qw(
    NI_DGRAM
 );
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Carp;
 
@@ -83,6 +83,11 @@ machines that do not or cannot support C<Socket6>.
 
 =cut
 
+# We can't set up the symbols until the first 'import' time, to know if we're
+# going to get the :no_Socket6 import flag. But to guard against 'constant
+# subroutine redefined ...' warnings, we'll track if we've done it once.
+my $DIDSYMBOLS = 0;
+
 sub import
 {
    my $class = shift;
@@ -91,25 +96,29 @@ sub import
    my $can_socket6 = 0;
    $can_socket6 = defined eval { require Socket6 } unless delete $symbols{':no_Socket6'};
 
-   if( $can_socket6 ) {
-      import Socket6 @EXPORT;
-   }
-   else {
-      require Socket;
+   if( not $DIDSYMBOLS ) {
+      if( $can_socket6 ) {
+         import Socket6 @EXPORT;
+      }
+      else {
+         require Socket;
 
-      require constant;
+         require constant;
 
-      import constant AI_PASSIVE     => 1;
-      import constant AI_CANONNAME   => 2;
-      import constant AI_NUMERICHOST => 4;
+         import constant AI_PASSIVE     => 1;
+         import constant AI_CANONNAME   => 2;
+         import constant AI_NUMERICHOST => 4;
 
-      import constant NI_NUMERICHOST => 1;
-      import constant NI_NUMERICSERV => 2;
-      import constant NI_NAMEREQD    => 8;
-      import constant NI_DGRAM       => 16;
+         import constant NI_NUMERICHOST => 1;
+         import constant NI_NUMERICSERV => 2;
+         import constant NI_NAMEREQD    => 8;
+         import constant NI_DGRAM       => 16;
 
-      *getaddrinfo = \&_fake_getaddrinfo;
-      *getnameinfo = \&_fake_getnameinfo;
+         *getaddrinfo = \&_fake_getaddrinfo;
+         *getnameinfo = \&_fake_getnameinfo;
+      }
+
+      $DIDSYMBOLS = 1;
    }
 
    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;

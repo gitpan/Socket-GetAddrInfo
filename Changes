@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.06    BUGFIXES:
+         * Avoid (harmless) "Constant subroutine .. redefined" warnings if
+           'use'd multiple times, when Socket6 is not available.
+
 0.05    CHANGES:
          * Reworded DESCRIPTION section of documentation
          * Fixed some bugs in the SYNOPSIS example
