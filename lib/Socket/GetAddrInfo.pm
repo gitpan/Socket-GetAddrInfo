@@ -23,7 +23,7 @@ our @EXPORT = qw(
    NI_DGRAM
 );
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 use Carp;
 
@@ -162,7 +162,7 @@ sub _fake_getaddrinfo
 
    $service = "" unless defined $service;
 
-   $family = Socket::AF_INET() unless defined $family;
+   $family ||= Socket::AF_INET(); # 0 == AF_UNSPEC, which we want too
    $family == Socket::AF_INET() or croak "Cannot emulate getaddrinfo() on family $family";
 
    $socktype ||= 0;

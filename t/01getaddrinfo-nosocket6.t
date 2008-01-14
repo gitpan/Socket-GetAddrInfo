@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 51;
+use Test::More tests => 52;
 use Test::Exception;
 
 use Socket qw( AF_INET AF_UNIX IPPROTO_TCP SOCK_STREAM pack_sockaddr_in unpack_sockaddr_in inet_aton );
@@ -89,6 +89,10 @@ do_test_getaddrinfo "pause.perl.org", "20";
 
 # Now something I hope doesn't exist - we put it guess at a named port
 { local $failure_OK = 1; do_test_getaddrinfo "localhost", "ZZgetaddrinfoNameTest"; }
+
+# Check that AF_UNSPEC = 0 still works; though just behaves like AF_INET
+my @expect = getaddrinfo( "localhost", "53" );
+is_deeply( [ getaddrinfo( "localhost", "53", 0 ) ], \@expect, "getaddrinfo with family = AF_UNSPEC" );
 
 dies_ok( sub { getaddrinfo( "somehost", "someservice", AF_UNIX ) },
          "getaddrinfo on family != AF_INET dies" );
