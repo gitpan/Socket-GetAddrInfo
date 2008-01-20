@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Test::More no_plan => 1;
+
+use Socket::GetAddrInfo qw( :newapi getnameinfo EAI_NONAME NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
+
+use Socket qw( AF_INET pack_sockaddr_in inet_aton );
+
+my ( $err, $host, $service ) = @_;
+
+( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST|NI_NUMERICSERV );
+is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );
+is( "$err", "", '$err eq "" for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );
+
+is( $host, "127.0.0.1", '$host is 127.0.0.1' );
+is( $service, "80", '$service is 80' );
+
+# Probably "localhost" but we'd better ask the system to be sure
+my $expect_host = gethostbyaddr( inet_aton( "127.0.0.1" ), AF_INET );
+defined $expect_host or $expect_host = "127.0.0.1";
+
+( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICSERV );
+is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICSERV' );
+
+is( $host, $expect_host, "\$host is $expect_host" );
+is( $service, "80", '$service is 80' );
+
+# Probably "www" but we'd better ask the system to be sure
+my $expect_service = getservbyport( 80, "tcp" );
+defined $expect_service or $expect_service = "80";
+
+( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST );
+is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST' );
+
+is( $host, "127.0.0.1", '$host is 127.0.0.1' );
+is( $service, $expect_service, "\$service is $expect_service" );
+
+# This is hard. We need to find an IP address we can guarantee will not have
+# a name. Simple solution is to find one.
+
+my $addr;
+my $num;
+
+foreach ( 1 .. 254 ) {
+   my $candidate_addr = pack_sockaddr_in( 80, inet_aton( "192.168.$_.$_" ) );
+
+   my ( $err ) = getnameinfo( $candidate_addr, NI_NAMEREQD );
+   if( !$err ) {
+      next;
+   }
+   else {
+      $addr = $candidate_addr;
+      $num = $_;
+      last;
+   }
+}
+
+SKIP: {
+   skip "Cannot find an IP address without a name in 192.168/24", 4 unless defined $addr;
+
+   ( $err, $host, $service ) = getnameinfo( $addr );
+   is( $err+0, 0, "\$err == 0 for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}" );
+
+   is( $host, "192.168.$num.$num", "\$host is 192.168.$num.$num" );
+   is( $service, $expect_service, "\$service is $expect_service" );
+
+   ( $err, $host, $service ) = getnameinfo( $addr, NI_NAMEREQD );
+   is( $err+0, EAI_NONAME, "\$err == EAI_NONAME for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}/NI_NAMEREQD" );
+}

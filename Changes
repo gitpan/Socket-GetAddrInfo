@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_1  CHANGES:
+         * Complete rewrite to XS+PP emulation system. No longer uses Socket6
+           on account of API and error reporting issues.
+         * Provided two styles of API at import time (:newapi and :Socket6api)
+           to allow caller to choose between RFC2553-like or Socket6 styles
+
 0.07    BUGFIXES:
          * Ensure that emulated getaddrinfo() copes with family=AF_UNSPEC (0)
 
