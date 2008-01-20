@@ -39,12 +39,10 @@ use Scalar::Util qw( dualvar );
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_1";
+   our $VERSION = "0.08_2";
 
    if( not $ENV{NO_GETADDRINFO_XS} and eval { __PACKAGE__->DynaLoader::bootstrap( $VERSION ); 1 } ) {
       push @ISA, qw( DynaLoader );
-      *getaddrinfo = \&real_getaddrinfo;
-      *getnameinfo = \&real_getnameinfo;
    }
    else {
       *getaddrinfo = \&fake_getaddrinfo;

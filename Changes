@@ -1,5 +1,16 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_2  BUGFIXES:
+         * Declare variables in "PREINIT" XS section, not "INIT"; keeps
+           non-C99 compilers happy
+         * Skip tests that require internet connectivity unless the tester
+           declares it possible
+         * Declare test counts upfront in testing scripts
+         * Renamed XS functions 'getaddrinfo' and 'getnameinfo'; no need to
+           prefix with 'real_'
+         * Folded Configure.pl inline into Build.PL, in case it has to make
+           further decisions
+
 0.08_1  CHANGES:
          * Complete rewrite to XS+PP emulation system. No longer uses Socket6
            on account of API and error reporting issues.

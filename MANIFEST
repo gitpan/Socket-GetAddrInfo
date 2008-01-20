@@ -1,6 +1,5 @@
 Build.PL
 Changes
-Configure.pl
 lib/Socket/GetAddrInfo.pm
 lib/Socket/GetAddrInfo.xs
 Makefile.PL

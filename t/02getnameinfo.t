@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More no_plan => 1;
+use Test::More tests => 14;
 
 use Socket::GetAddrInfo qw( :newapi getnameinfo EAI_NONAME NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
 

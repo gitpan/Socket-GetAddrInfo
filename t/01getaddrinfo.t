@@ -52,10 +52,18 @@ ok( $res[0]->{protocol} == 0 || $res[0]->{protocol} == IPPROTO_TCP,
 
 # Now some tests of a few well-known internet hosts
 
-( $err, @res ) = getaddrinfo( "cpan.perl.org", "ftp", { socktype => SOCK_STREAM } );
-is( $err+0, 0,  '$err == 0 for host=cpan.perl.org/service=ftp/socktype=STREAM' );
-# Might get more than one; e.g. different families
-ok( scalar @res > 0, '@res has results' );
+SKIP: {
+   unless( $ENV{I_CAN_HAS_INTERNETS} ) {
+      diag "Skipping test that requires internet connectivity";
+      diag "Set environment variable I_CAN_HAS_INTERNETS=1 to run this";
+      skip "No internet connectivity", 2;
+   }
+
+   ( $err, @res ) = getaddrinfo( "cpan.perl.org", "ftp", { socktype => SOCK_STREAM } );
+   is( $err+0, 0,  '$err == 0 for host=cpan.perl.org/service=ftp/socktype=STREAM' );
+   # Might get more than one; e.g. different families
+   ok( scalar @res > 0, '@res has results' );
+}
 
 # Now something I hope doesn't exist - we put it in a known-missing TLD
 

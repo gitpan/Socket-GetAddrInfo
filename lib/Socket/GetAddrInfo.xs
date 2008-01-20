@@ -59,14 +59,13 @@ BOOT:
 }
 
 void
-real_getaddrinfo(host, service, hints=NULL)
+getaddrinfo(host, service, hints=NULL)
     char *host
     char *service
     SV   *hints
 
-  INIT:
+  PREINIT:
     struct addrinfo hints_s = { 0 };
-    SV **valp;
     struct addrinfo *res;
     struct addrinfo *res_iter;
     int err;
@@ -74,6 +73,7 @@ real_getaddrinfo(host, service, hints=NULL)
   PPCODE:
     if(hints && SvOK(hints)) {
       HV *hintshash;
+      SV **valp;
 
       if(!SvROK(hints) || SvTYPE(SvRV(hints)) != SVt_PVHV)
         croak("hints is not a HASH reference");
@@ -117,11 +117,11 @@ real_getaddrinfo(host, service, hints=NULL)
     freeaddrinfo(res);
 
 void
-real_getnameinfo(addr, flags=0)
+getnameinfo(addr, flags=0)
     SV  *addr
     int  flags
 
-  INIT:
+  PREINIT:
     SV *host;
     SV *serv;
     char *addr_s;

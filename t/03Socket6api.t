@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More no_plan => 1;
+use Test::More tests => 8;
 
 use Socket::GetAddrInfo qw( :Socket6api getaddrinfo getnameinfo NI_NUMERICHOST NI_NUMERICSERV );
 use Socket qw( AF_INET SOCK_STREAM IPPROTO_TCP pack_sockaddr_in inet_aton );
