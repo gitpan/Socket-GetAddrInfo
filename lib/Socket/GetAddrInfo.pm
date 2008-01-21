@@ -39,7 +39,7 @@ use Scalar::Util qw( dualvar );
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_2";
+   our $VERSION = "0.08_3";
 
    if( not $ENV{NO_GETADDRINFO_XS} and eval { __PACKAGE__->DynaLoader::bootstrap( $VERSION ); 1 } ) {
       push @ISA, qw( DynaLoader );

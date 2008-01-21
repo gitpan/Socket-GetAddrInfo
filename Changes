@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_3  BUGFIXES:
+         * Use ExtUtils::CBuilder to compile the test .c file in the
+           Configure() stage, to make it (hopefully) more portable
+         * Some OSes return $err==0 but no results for invalid names - make
+           sure the test script can cope.
+
 0.08_2  BUGFIXES:
          * Declare variables in "PREINIT" XS section, not "INIT"; keeps
            non-C99 compilers happy

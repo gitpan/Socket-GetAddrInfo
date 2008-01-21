@@ -67,8 +67,10 @@ SKIP: {
 
 # Now something I hope doesn't exist - we put it in a known-missing TLD
 
+# Some OSes return $err == 0 but no results
 ( $err, @res ) = getaddrinfo( "something.invalid", "ftp", { socktype => SOCK_STREAM } );
-is( $err+0, EAI_NONAME, '$err == EAI_NONAME for host=something.invalid/service=ftp/socktype=SOCK_STREAM' );
+ok( $err == EAI_NONAME || ( $err == 0 && @res == 0 ),
+   '$err == EAI_NONAME or @res == 0 for host=something.invalid/service=ftp/socktype=SOCK_STREAM' );
 
 # Now something I hope doesn't exist - we put it guess at a named port
 

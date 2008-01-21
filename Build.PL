@@ -3,7 +3,7 @@ use warnings;
 
 use Module::Build;
 
-use Config;
+use ExtUtils::CBuilder;
 
 sub Configure
 {
@@ -12,20 +12,19 @@ sub Configure
       return 0;
    }
 
-   print "Detecting if libc supports getaddrinfo()...\n";
+   my $cbuilder = ExtUtils::CBuilder->new();
 
-   my $test_c   = "test-getaddrinfo.c";
-   my $test_exe = "test-getaddrinfo";
+   print "Detecting if the environment has a C compiler...\n";
+   return 0 unless $cbuilder->have_compiler;
 
-   END {
-      defined $test_c   and -f $test_c   and unlink $test_c;
-      defined $test_exe and -f $test_exe and unlink $test_exe;
-   }
+   print "\nDetecting if libc supports getaddrinfo()...\n";
 
-   my $cc = $Config{cc};
-   open( my $test_c_fh, "> $test_c" ) or die "Cannot write test.c - $!";
+   my $test_source = "test-getaddrinfo.c";
 
-   print $test_c_fh <<EOF;
+   open( my $test_source_fh, "> $test_source" ) or die "Cannot write $test_source - $!";
+   END { defined $test_source and -f $test_source and unlink $test_source; }
+
+   print $test_source_fh <<EOF;
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -42,21 +41,34 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   close $test_c_fh;
+   close $test_source_fh;
 
-   if( system( $cc, "-o", $test_exe, $test_c ) != 0 ) {
-      print "Failed to compile $test_c - XS code will be disabled\n";
+   my $test_obj = eval { $cbuilder->compile( source => $test_source ) };
+   END { defined $test_obj and -f $test_obj and unlink $test_obj; }
+
+   if( not defined $test_obj ) {
+      print "\nFailed to compile $test_source - XS code will be disabled\n";
       return 0;
    }
 
-   print "Compiled $test_exe\n";
+   print "Compiled $test_source to $test_obj\n\n";
+
+   my $test_exe = eval { $cbuilder->link_executable( objects => $test_obj ) };
+   END { defined $test_exe and -f $test_exe and unlink $test_exe; }
+
+   if( not defined $test_exe ) {
+      print "\nFailed to link $test_obj to an executable - XS code will be disabled\n";
+      return 0;
+   }
+
+   print "Linked $test_obj to $test_exe\n\n";
 
    if( system( "./$test_exe" ) != 0 ) {
-      print "Failed to run $test_exe - XS code will be disabled\n";
+      print "\nFailed to run $test_exe - XS code will be disabled\n";
       return 0;
    }
 
-   print "Successfully ran $test_exe - looks like the libc supports getaddrinfo()\n";
+   print "\nSuccessfully ran $test_exe - looks like the libc supports getaddrinfo()\n";
    return 1;
 }
 
@@ -71,6 +83,7 @@ my $build = Module::Build->new
    recommends => {
                },
    build_requires => {
+                 'ExtUtils::CBuilder' => 0,
                  'Module::Build' => 0,
                  'Module::Build::Compat' => 0,
                  'Test::More' => 0,
