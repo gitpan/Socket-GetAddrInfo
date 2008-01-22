@@ -30,33 +30,80 @@ SV *err_to_SV(int err)
   return ret;
 }
 
+static void setup_constants(void)
+{
+  HV *stash;
+  AV *export;
+
+  stash = gv_stashpvn("Socket::GetAddrInfo", 19, TRUE);
+  export = get_av("Socket::GetAddrInfo::EXPORT", TRUE);
+
+#define DO_CONSTANT(c) \
+  newCONSTSUB(stash, #c, newSViv(c)); \
+  av_push(export, newSVpv(#c, 0));
+
+#ifdef AI_PASSIVE
+  DO_CONSTANT(AI_PASSIVE)
+#endif
+#ifdef AI_CANONNAME
+  DO_CONSTANT(AI_CANONNAME)
+#endif
+#ifdef AI_NUMERICHOST
+  DO_CONSTANT(AI_NUMERICHOST)
+#endif
+#ifdef AI_NUMERICSERV
+  DO_CONSTANT(AI_NUMERICSERV)
+#endif
+
+#ifdef EAI_BADFLAGS
+  DO_CONSTANT(EAI_BADFLAGS)
+#endif
+#ifdef EAI_NONAME
+  DO_CONSTANT(EAI_NONAME)
+#endif
+#ifdef EAI_AGAIN
+  DO_CONSTANT(EAI_AGAIN)
+#endif
+#ifdef EAI_FAIL
+  DO_CONSTANT(EAI_FAIL)
+#endif
+#ifdef EAI_NODATA
+  DO_CONSTANT(EAI_NODATA)
+#endif
+#ifdef EAI_FAMILY
+  DO_CONSTANT(EAI_FAMILY)
+#endif
+#ifdef EAI_SOCKTYPE
+  DO_CONSTANT(EAI_SOCKTYPE)
+#endif
+#ifdef EAI_SERVICE
+  DO_CONSTANT(EAI_SERVICE)
+#endif
+#ifdef EAI_ADDRFAMILY
+  DO_CONSTANT(EAI_ADDRFAMILY)
+#endif
+#ifdef EAI_MEMORY
+  DO_CONSTANT(EAI_MEMORY)
+#endif
+
+#ifdef NI_NUMERICHOST
+  DO_CONSTANT(NI_NUMERICHOST)
+#endif
+#ifdef NI_NUMERICSERV
+  DO_CONSTANT(NI_NUMERICSERV)
+#endif
+#ifdef NI_NAMEREQD
+  DO_CONSTANT(NI_NAMEREQD)
+#endif
+#ifdef NI_DGRAM
+  DO_CONSTANT(NI_DGRAM)
+#endif
+}
+
 MODULE = Socket::GetAddrInfo      PACKAGE = Socket::GetAddrInfo
 
 BOOT:
-{
-  HV *stash;
-  stash = gv_stashpvn("Socket::GetAddrInfo", 19, TRUE);
-
- newCONSTSUB(stash, "AI_PASSIVE",     newSViv(AI_PASSIVE));
- newCONSTSUB(stash, "AI_CANONNAME",   newSViv(AI_CANONNAME));
- newCONSTSUB(stash, "AI_NUMERICHOST", newSViv(AI_NUMERICHOST));
-
- newCONSTSUB(stash, "EAI_BADFLAGS",   newSViv(EAI_BADFLAGS));
- newCONSTSUB(stash, "EAI_NONAME",     newSViv(EAI_NONAME));
- newCONSTSUB(stash, "EAI_AGAIN",      newSViv(EAI_AGAIN));
- newCONSTSUB(stash, "EAI_FAIL",       newSViv(EAI_FAIL));
- newCONSTSUB(stash, "EAI_NODATA",     newSViv(EAI_NODATA));
- newCONSTSUB(stash, "EAI_FAMILY",     newSViv(EAI_FAMILY));
- newCONSTSUB(stash, "EAI_SOCKTYPE",   newSViv(EAI_SOCKTYPE));
- newCONSTSUB(stash, "EAI_SERVICE",    newSViv(EAI_SERVICE));
- newCONSTSUB(stash, "EAI_ADDRFAMILY", newSViv(EAI_ADDRFAMILY));
- newCONSTSUB(stash, "EAI_MEMORY",     newSViv(EAI_MEMORY));
-
- newCONSTSUB(stash, "NI_NUMERICHOST", newSViv(NI_NUMERICHOST));
- newCONSTSUB(stash, "NI_NUMERICSERV", newSViv(NI_NUMERICSERV));
- newCONSTSUB(stash, "NI_NAMEREQD",    newSViv(NI_NAMEREQD));
- newCONSTSUB(stash, "NI_DGRAM",       newSViv(NI_DGRAM));
-}
+  setup_constants();
 
 void
 getaddrinfo(host, service, hints=NULL)

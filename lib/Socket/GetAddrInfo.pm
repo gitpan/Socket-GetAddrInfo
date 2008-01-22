@@ -9,42 +9,28 @@ use strict;
 
 use Exporter;
 use DynaLoader;
-our @EXPORT = qw(
-   getaddrinfo
-   getnameinfo
-
-   AI_PASSIVE
-   AI_CANONNAME
-   AI_NUMERICHOST
-
-   EAI_BADFLAGS
-   EAI_NONAME
-   EAI_AGAIN
-   EAI_FAIL
-   EAI_NODATA
-   EAI_FAMILY
-   EAI_SOCKTYPE
-   EAI_SERVICE
-   EAI_ADDRFAMILY
-   EAI_MEMORY
-
-   NI_NUMERICHOST
-   NI_NUMERICSERV
-   NI_NAMEREQD
-   NI_DGRAM
-);
 
 use Carp;
 use Scalar::Util qw( dualvar );
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_3";
+   our $VERSION = "0.08_4";
+
+   our @EXPORT = qw(
+      getaddrinfo
+      getnameinfo
+   );
+
+   push @ISA, qw( DynaLoader ); # Must be last so we can pop it if necessary
 
    if( not $ENV{NO_GETADDRINFO_XS} and eval { __PACKAGE__->DynaLoader::bootstrap( $VERSION ); 1 } ) {
-      push @ISA, qw( DynaLoader );
+      # Do nothing
    }
    else {
+      # Not a DynaLoader any more
+      pop @ISA;
+
       *getaddrinfo = \&fake_getaddrinfo;
       *getnameinfo = \&fake_getnameinfo;
 
@@ -54,25 +40,30 @@ BEGIN {
       # These numbers borrowed from GNU libc's implementation, but since
       # they're only used by our emulation, it doesn't matter if the real
       # platform's values differ
-      import constant AI_PASSIVE     => 1;
-      import constant AI_CANONNAME   => 2;
-      import constant AI_NUMERICHOST => 4;
+      my %constants = (
+          AI_PASSIVE     => 1,
+          AI_CANONNAME   => 2,
+          AI_NUMERICHOST => 4,
 
-      import constant EAI_BADFLAGS   => -1;
-      import constant EAI_NONAME     => -2;
-      import constant EAI_AGAIN      => -3;
-      import constant EAI_FAIL       => -4;
-      import constant EAI_NODATA     => -5;
-      import constant EAI_FAMILY     => -6;
-      import constant EAI_SOCKTYPE   => -7;
-      import constant EAI_SERVICE    => -8;
-      import constant EAI_ADDRFAMILY => -9;
-      import constant EAI_MEMORY     => -10;
+          EAI_BADFLAGS   => -1,
+          EAI_NONAME     => -2,
+          EAI_AGAIN      => -3,
+          EAI_FAIL       => -4,
+          EAI_NODATA     => -5,
+          EAI_FAMILY     => -6,
+          EAI_SOCKTYPE   => -7,
+          EAI_SERVICE    => -8,
+          EAI_ADDRFAMILY => -9,
+          EAI_MEMORY     => -10,
 
-      import constant NI_NUMERICHOST => 1;
-      import constant NI_NUMERICSERV => 2;
-      import constant NI_NAMEREQD    => 8;
-      import constant NI_DGRAM       => 16;
+          NI_NUMERICHOST => 1,
+          NI_NUMERICSERV => 2,
+          NI_NAMEREQD    => 8,
+          NI_DGRAM       => 16,
+      );
+
+      import constant $_ => $constants{$_} for keys %constants;
+      push @EXPORT, $_ for keys %constants;
    }
 }
 

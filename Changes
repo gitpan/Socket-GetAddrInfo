@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_4  BUGFIXES:
+         * Define constants in XS code wrapped in #ifdef tests, to ensure
+           only ones that the platform defines are attempted.
+         * Print whether PP or XS implementation are being used in the
+           t/00use.t file
+
 0.08_3  BUGFIXES:
          * Use ExtUtils::CBuilder to compile the test .c file in the
            Configure() stage, to make it (hopefully) more portable
