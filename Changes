@@ -1,5 +1,12 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_5  BUGFIXES:
+         * Better comparison of sockaddr returns - unpack and test components
+           to avoid errors on platforms that use sin_len, since Socket doesn't
+         * Use XSRETURN() in XS functions to ensure stack is correct height
+         * Better diagnostic if $err tests fail - convert number to symbolic
+           constant
+
 0.08_4  BUGFIXES:
          * Define constants in XS code wrapped in #ifdef tests, to ensure
            only ones that the platform defines are attempted.

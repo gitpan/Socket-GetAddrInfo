@@ -4,14 +4,54 @@ use strict;
 
 use Test::More tests => 14;
 
-use Socket::GetAddrInfo qw( :newapi getnameinfo EAI_NONAME NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
+use Socket::GetAddrInfo qw( :newapi getnameinfo NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
 
 use Socket qw( AF_INET pack_sockaddr_in inet_aton );
+
+sub err_to_const
+{
+   my ( $err ) = @_;
+
+   return "EAI_NOERROR" if $err == 0;
+
+   no strict 'refs';
+
+   foreach my $const ( keys %{"Socket::GetAddrInfo::"} ) {
+      next unless $const =~ m/^EAI_/;
+
+      my $sub = "Socket::GetAddrInfo::$const";
+      return $const if $sub->() == $err;
+   }
+
+   return undef;
+}
+
+sub is_err
+{
+   my ( $got, $expect, $message ) = @_;
+
+   if( $got == $expect ) {
+      pass( $message );
+      return;
+   }
+
+   my $got_const    = err_to_const( $got );
+   my $expect_const = err_to_const( $expect );
+
+   if( defined $got_const ) {
+      diag( "Expected err == $expect_const, got err == $got_const" );
+      fail( $message );
+   }
+   else {
+      diag( "Expected err == $expect_const, got err == unknown ('$got')" );
+      fail( $message );
+   }
+}
 
 my ( $err, $host, $service ) = @_;
 
 ( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST|NI_NUMERICSERV );
-is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );
+is_err( $err, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );
 is( "$err", "", '$err eq "" for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );
 
 is( $host, "127.0.0.1", '$host is 127.0.0.1' );
@@ -22,7 +62,7 @@ my $expect_host = gethostbyaddr( inet_aton( "127.0.0.1" ), AF_INET );
 defined $expect_host or $expect_host = "127.0.0.1";
 
 ( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICSERV );
-is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICSERV' );
+is_err( $err, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICSERV' );
 
 is( $host, $expect_host, "\$host is $expect_host" );
 is( $service, "80", '$service is 80' );
@@ -32,7 +72,7 @@ my $expect_service = getservbyport( 80, "tcp" );
 defined $expect_service or $expect_service = "80";
 
 ( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST );
-is( $err+0, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST' );
+is_err( $err, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST' );
 
 is( $host, "127.0.0.1", '$host is 127.0.0.1' );
 is( $service, $expect_service, "\$service is $expect_service" );
@@ -61,11 +101,11 @@ SKIP: {
    skip "Cannot find an IP address without a name in 192.168/24", 4 unless defined $addr;
 
    ( $err, $host, $service ) = getnameinfo( $addr );
-   is( $err+0, 0, "\$err == 0 for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}" );
+   is_err( $err, 0, "\$err == 0 for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}" );
 
    is( $host, "192.168.$num.$num", "\$host is 192.168.$num.$num" );
    is( $service, $expect_service, "\$service is $expect_service" );
 
    ( $err, $host, $service ) = getnameinfo( $addr, NI_NAMEREQD );
-   is( $err+0, EAI_NONAME, "\$err == EAI_NONAME for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}/NI_NAMEREQD" );
+   ok( $err != 0, "\$err != 0 for {family=AF_INET,port=80,sinaddr=192.168.$num.$num}/NI_NAMEREQD" );
 }

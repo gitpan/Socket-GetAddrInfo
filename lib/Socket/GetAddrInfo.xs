@@ -116,6 +116,7 @@ getaddrinfo(host, service, hints=NULL)
     struct addrinfo *res;
     struct addrinfo *res_iter;
     int err;
+    int n_res;
 
   PPCODE:
     if(hints && SvOK(hints)) {
@@ -142,8 +143,9 @@ getaddrinfo(host, service, hints=NULL)
     XPUSHs(err_to_SV(err));
 
     if(err)
-      return;
+      XSRETURN(1);
 
+    n_res = 0;
     for(res_iter = res; res_iter; res_iter = res_iter->ai_next) {
       HV *res_hv = newHV();
 
@@ -159,9 +161,12 @@ getaddrinfo(host, service, hints=NULL)
         hv_store(res_hv, "canonname", 9, &PL_sv_undef, 0);
 
       XPUSHs(newRV_noinc((SV*)res_hv));
+      n_res++;
     }
 
     freeaddrinfo(res);
+
+    XSRETURN(1 + n_res);
 
 void
 getnameinfo(addr, flags=0)
@@ -189,10 +194,12 @@ getnameinfo(addr, flags=0)
     XPUSHs(err_to_SV(err));
 
     if(err)
-      return;
+      XSRETURN(1);
 
     SvCUR_set(host, strlen(SvPV_nolen(host)));
     SvCUR_set(serv, strlen(SvPV_nolen(serv)));
 
     XPUSHs(host);
     XPUSHs(serv);
+
+    XSRETURN(3);

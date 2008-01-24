@@ -13,9 +13,11 @@ use DynaLoader;
 use Carp;
 use Scalar::Util qw( dualvar );
 
+my %errstr;
+
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_4";
+   our $VERSION = "0.08_5";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -47,14 +49,9 @@ BEGIN {
 
           EAI_BADFLAGS   => -1,
           EAI_NONAME     => -2,
-          EAI_AGAIN      => -3,
-          EAI_FAIL       => -4,
           EAI_NODATA     => -5,
           EAI_FAMILY     => -6,
-          EAI_SOCKTYPE   => -7,
           EAI_SERVICE    => -8,
-          EAI_ADDRFAMILY => -9,
-          EAI_MEMORY     => -10,
 
           NI_NUMERICHOST => 1,
           NI_NUMERICSERV => 2,
@@ -64,6 +61,15 @@ BEGIN {
 
       import constant $_ => $constants{$_} for keys %constants;
       push @EXPORT, $_ for keys %constants;
+
+      %errstr = (
+         # These strings from RFC 2553
+         EAI_BADFLAGS()   => "invalid value for ai_flags",
+         EAI_NONAME()     => "nodename nor servname provided, or not known",
+         EAI_NODATA()     => "no address associated with nodename",
+         EAI_FAMILY()     => "ai_family not supported",
+         EAI_SERVICE()    => "servname not supported for ai_socktype",
+      );
    }
 }
 
@@ -322,20 +328,6 @@ sub Socket6_getnameinfo
 # Borrowed from Regexp::Common::net
 my $REGEXP_IPv4_DECIMAL = qr/25[0-5]|2[0-4][0-9]|1?[0-9][0-9]{1,2}/;
 my $REGEXP_IPv4_DOTTEDQUAD = qr/$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL\.$REGEXP_IPv4_DECIMAL/;
-
-my %errstr = (
-   # These strings from RFC 2553
-   EAI_BADFLAGS()   => "invalid value for ai_flags",
-   EAI_NONAME()     => "nodename nor servname provided, or not known",
-   EAI_AGAIN()      => "temporary failure in name resolution",
-   EAI_FAIL()       => "non-recoverable failure in name resolution",
-   EAI_NODATA()     => "no address associated with nodename",
-   EAI_FAMILY()     => "ai_family not supported",
-   EAI_SOCKTYPE()   => "ai_socktype not supported",
-   EAI_SERVICE()    => "servname not supported for ai_socktype",
-   EAI_ADDRFAMILY() => "address family for nodename not supported",
-   EAI_MEMORY()     => "memory allocation failure",
-);
 
 sub fake_makeerr
 {
