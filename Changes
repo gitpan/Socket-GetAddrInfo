@@ -1,5 +1,8 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_6  BUGFIXES:
+         * Set 'sa_len' member of sockaddr structure if platform needs it
+
 0.08_5  BUGFIXES:
          * Better comparison of sockaddr returns - unpack and test components
            to avoid errors on platforms that use sin_len, since Socket doesn't

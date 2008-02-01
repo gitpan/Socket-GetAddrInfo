@@ -141,6 +141,12 @@ SKIP: {
 ( $err, @res ) = getaddrinfo( "something.invalid", "ftp", { socktype => SOCK_STREAM } );
 ok( $err != 0 || ( $err == 0 && @res == 0 ),
    '$err != 0 or @res == 0 for host=something.invalid/service=ftp/socktype=SOCK_STREAM' );
+if( @res ) {
+   # Diagnostic that might help
+   while( my $r = shift @res ) {
+      diag( "family=$r->{family} socktype=$r->{socktype} protocol=$r->{protocol} addr=[" . length( $r->{addr} ) . " bytes]" );
+   }
+}
 
 # Now something I hope doesn't exist - we put it guess at a named port
 

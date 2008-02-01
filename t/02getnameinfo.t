@@ -48,7 +48,7 @@ sub is_err
    }
 }
 
-my ( $err, $host, $service ) = @_;
+my ( $err, $host, $service );
 
 ( $err, $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST|NI_NUMERICSERV );
 is_err( $err, 0,  '$err == 0 for {family=AF_INET,port=80,sinaddr=127.0.0.1}/NI_NUMERICHOST|NI_NUMERICSERV' );

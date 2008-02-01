@@ -5,6 +5,54 @@ use Module::Build;
 
 use ExtUtils::CBuilder;
 
+my $HAVE_SOCKADDR_SA_LEN;
+
+sub try_compile_run
+{
+   my ( $cbuilder, $name, $source ) = @_;
+
+   my $test_source = "test-$name.c";
+
+   open( my $test_source_fh, "> $test_source" ) or die "Cannot write $test_source - $!";
+
+   print $test_source_fh $source;
+
+   close $test_source_fh;
+
+   my $test_obj = eval { $cbuilder->compile( source => $test_source ) };
+
+   unlink $test_source;
+
+   if( not defined $test_obj ) {
+      print "\nFailed to compile $test_source\n";
+      return 0;
+   }
+
+   print "Compiled $test_source to $test_obj\n\n";
+
+   my $test_exe = eval { $cbuilder->link_executable( objects => $test_obj ) };
+   END { defined $test_exe and -f $test_exe and unlink $test_exe; }
+
+   unlink $test_obj;
+
+   if( not defined $test_exe ) {
+      print "\nFailed to link $test_obj to an executable\n";
+      return 0;
+   }
+
+   print "Linked $test_obj to $test_exe\n\n";
+
+   if( system( "./$test_exe" ) != 0 ) {
+      print "\nFailed to run $test_exe\n";
+      unlink $test_exe;
+      return 0;
+   }
+
+   unlink $test_exe;
+
+   return 1;
+}
+
 sub Configure
 {
    if( $ENV{NO_XS} ) {
@@ -19,12 +67,7 @@ sub Configure
 
    print "\nDetecting if libc supports getaddrinfo()...\n";
 
-   my $test_source = "test-getaddrinfo.c";
-
-   open( my $test_source_fh, "> $test_source" ) or die "Cannot write $test_source - $!";
-   END { defined $test_source and -f $test_source and unlink $test_source; }
-
-   print $test_source_fh <<EOF;
+   my $gai_test = <<EOF;
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -41,34 +84,26 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   close $test_source_fh;
+   return 0 unless try_compile_run( $cbuilder, "getaddrinfo", $gai_test );
 
-   my $test_obj = eval { $cbuilder->compile( source => $test_source ) };
-   END { defined $test_obj and -f $test_obj and unlink $test_obj; }
+   print "\nLooks like the libc supports getaddrinfo()\n";
 
-   if( not defined $test_obj ) {
-      print "\nFailed to compile $test_source - XS code will be disabled\n";
-      return 0;
-   }
+   print "Detecting if sockaddr has sa_len field...\n";
 
-   print "Compiled $test_source to $test_obj\n\n";
+   my $sa_len_test = <<EOF;
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+int main(int argc, char *argv[]) {
+   struct sockaddr sa;
+   sa.sa_len = 0;
+   exit(0);
+}
+EOF
 
-   my $test_exe = eval { $cbuilder->link_executable( objects => $test_obj ) };
-   END { defined $test_exe and -f $test_exe and unlink $test_exe; }
+   $HAVE_SOCKADDR_SA_LEN = try_compile_run( $cbuilder, "sa_len", $sa_len_test );
 
-   if( not defined $test_exe ) {
-      print "\nFailed to link $test_obj to an executable - XS code will be disabled\n";
-      return 0;
-   }
-
-   print "Linked $test_obj to $test_exe\n\n";
-
-   if( system( "./$test_exe" ) != 0 ) {
-      print "\nFailed to run $test_exe - XS code will be disabled\n";
-      return 0;
-   }
-
-   print "\nSuccessfully ran $test_exe - looks like the libc supports getaddrinfo()\n";
    return 1;
 }
 
@@ -78,6 +113,7 @@ my $build = Module::Build->new
   (
    module_name => 'Socket::GetAddrInfo',
    dist_version_from => 'lib/Socket/GetAddrInfo.pm',
+   extra_compiler_flags => [ "-DHAVE_SOCKADDR_SA_LEN=$HAVE_SOCKADDR_SA_LEN" ],
    requires => {
                },
    recommends => {
