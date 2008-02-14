@@ -17,7 +17,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_6";
+   our $VERSION = "0.08_7";
 
    our @EXPORT = qw(
       getaddrinfo

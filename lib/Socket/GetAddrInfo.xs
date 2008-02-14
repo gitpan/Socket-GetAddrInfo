@@ -160,7 +160,7 @@ getaddrinfo(host, service, hints=NULL)
       else
         hv_store(res_hv, "canonname", 9, &PL_sv_undef, 0);
 
-      XPUSHs(newRV_noinc((SV*)res_hv));
+      XPUSHs(sv_2mortal(newRV_noinc((SV*)res_hv)));
       n_res++;
     }
 
@@ -204,7 +204,7 @@ getnameinfo(addr, flags=0)
     SvCUR_set(host, strlen(SvPV_nolen(host)));
     SvCUR_set(serv, strlen(SvPV_nolen(serv)));
 
-    XPUSHs(host);
-    XPUSHs(serv);
+    XPUSHs(sv_2mortal(host));
+    XPUSHs(sv_2mortal(serv));
 
     XSRETURN(3);

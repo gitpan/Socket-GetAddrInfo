@@ -138,13 +138,14 @@ SKIP: {
 # Now something I hope doesn't exist - we put it in a known-missing TLD
 
 # Some OSes return $err == 0 but no results
-( $err, @res ) = getaddrinfo( "something.invalid", "ftp", { socktype => SOCK_STREAM } );
+( $err, @res ) = getaddrinfo( "TbK4jM2M0OS.lm57DWIyu4i", "ftp", { socktype => SOCK_STREAM } );
 ok( $err != 0 || ( $err == 0 && @res == 0 ),
-   '$err != 0 or @res == 0 for host=something.invalid/service=ftp/socktype=SOCK_STREAM' );
+   '$err != 0 or @res == 0 for host=TbK4jM2M0OS.lm57DWIyu4i/service=ftp/socktype=SOCK_STREAM' );
 if( @res ) {
    # Diagnostic that might help
    while( my $r = shift @res ) {
       diag( "family=$r->{family} socktype=$r->{socktype} protocol=$r->{protocol} addr=[" . length( $r->{addr} ) . " bytes]" );
+      diag( "  addr=" . join( ", ", map { sprintf '0x%02x', ord $_ } split m//, $r->{addr} ) );
    }
 }
 

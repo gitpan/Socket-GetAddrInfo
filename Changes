@@ -1,5 +1,12 @@
 Revision history for Socket-GetAddrInfo
 
+0.08_7  CHANGES:
+         * Make sure to sv_2mortal() returned SV*s in XS code
+
+        BUGFIXES:
+         * Minor changes to test scripts that should reduce cornercase FAILs,
+           or at least help debug them if they occur
+
 0.08_6  BUGFIXES:
          * Set 'sa_len' member of sockaddr structure if platform needs it
 
