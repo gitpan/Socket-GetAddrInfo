@@ -17,7 +17,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.08_7";
+   our $VERSION = "0.08";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -176,6 +176,11 @@ is recommended that new code import the C<:newapi> style to take advantage of
 neater argument / return results, and error reporting. The C<:Socket6api>
 style is provided as backward-compatibility for code that wants to use
 C<Socket6>.
+
+If neither style is selected, then this module will provide a Socket6-like API
+to be compatible with earlier versions of C<Socket::GetAddrInfo>. This
+behaviour will change in a later version of the module - make sure to always
+specify the required API type.
 
 =cut
 
@@ -523,6 +528,19 @@ sub fake_getnameinfo
 1;
 
 __END__
+
+=head1 BUGS
+
+=over 4
+
+=item *
+
+At the time of writing, there are no test reports from the C<MSWin32> platform
+either PASS or FAIL. I suspect the code will not currently work as it stands
+on that platform, but it should be fairly easy to fix, as C<Socket6> is known
+to work there. Patches welcomed. :)
+
+=back
 
 =head1 SEE ALSO
 

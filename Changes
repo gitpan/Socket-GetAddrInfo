@@ -1,5 +1,8 @@
 Revision history for Socket-GetAddrInfo
 
+0.08    CHANGES:
+         * Declare as release
+
 0.08_7  CHANGES:
          * Make sure to sv_2mortal() returned SV*s in XS code
 
