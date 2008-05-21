@@ -1,5 +1,10 @@
 Revision history for Socket-GetAddrInfo
 
+0.09    CHANGES:
+         * Conditionally skip the tests for missing hostnames if the legacy
+           resolver finds an address anyway. This may mitigate test FAILs on
+           smoke test machines with wildcard DNS servers.
+
 0.08    CHANGES:
          * Declare as release
 

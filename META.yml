@@ -1,6 +1,6 @@
 ---
 name: Socket-GetAddrInfo
-version: 0.08
+version: 0.09
 author:
   - 'Paul Evans E<lt>leonerd@leonerd.org.ukE<gt>'
 abstract: |-
@@ -13,13 +13,14 @@ build_requires:
   ExtUtils::CBuilder: 0
   Module::Build: 0
   Module::Build::Compat: 0
+  Scalar::Util: 0
   Test::Exception: 0
   Test::More: 0
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.08
-generated_by: Module::Build version 0.2808
+    version: 0.09
+generated_by: Module::Build version 0.280801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

@@ -122,6 +122,7 @@ my $build = Module::Build->new
                  'ExtUtils::CBuilder' => 0,
                  'Module::Build' => 0,
                  'Module::Build::Compat' => 0,
+                 'Scalar::Util' => 0,
                  'Test::More' => 0,
                  'Test::Exception' => 0,
                },

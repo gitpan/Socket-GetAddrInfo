@@ -51,8 +51,18 @@ ok( $res[2] == 0 || $res[2] == IPPROTO_TCP,
 is_sinaddr( $res[3], 80, inet_aton( "127.0.0.1" ),
    '$res[3] is { "127.0.0.1", 80 }' );
 
-@res = getaddrinfo( "TbK4jM2M0OS.lm57DWIyu4i", 80, 0, SOCK_STREAM, 0, 0 );
-is( scalar @res, 1, '@res contains an error' );
+# Now something I hope doesn't exist - we put it in a known-missing TLD
+my $missinghost = "TbK4jM2M0OS.lm57DWIyu4i";
+
+# Some CPAN testing machines seem to have wildcard DNS servers that reply to
+# any request. We'd better check for them
+
+SKIP: {
+   skip "Resolver has an answer for $missinghost", 1 if gethostbyname( $missinghost );
+
+   @res = getaddrinfo( $missinghost, 80, 0, SOCK_STREAM, 0, 0 );
+   is( scalar @res, 1, '@res contains an error' );
+}
 
 my ( $host, $service ) = getnameinfo( pack_sockaddr_in( 80, inet_aton( "127.0.0.1" ) ), NI_NUMERICHOST|NI_NUMERICSERV );
 is( $host, "127.0.0.1", '$host is 127.0.0.1' );
