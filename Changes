@@ -1,5 +1,10 @@
 Revision history for Socket-GetAddrInfo
 
+0.10    BUGFIXES:
+         * Fixed a bug in getnameinfo() when handling IPv6 addresses, where
+           a buffer overrun causes at least a failure from libc, but has the
+           potential to cause a stack corruption or segfault.
+
 0.09    CHANGES:
          * Conditionally skip the tests for missing hostnames if the legacy
            resolver finds an address anyway. This may mitigate test FAILs on

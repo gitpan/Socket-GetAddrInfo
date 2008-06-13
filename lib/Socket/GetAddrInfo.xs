@@ -176,22 +176,26 @@ getnameinfo(addr, flags=0)
   PREINIT:
     SV *host;
     SV *serv;
-    char *addr_s;
-    struct sockaddr sa;
-    size_t addr_len;
+    struct sockaddr *sa;
+    STRLEN addr_len;
     int err;
 
   PPCODE:
     host = newSVpvn("", 1023);
     serv = newSVpvn("", 255);
 
-    addr_s = SvPVbyte(addr, addr_len);
-    memcpy(&sa, addr_s, addr_len);
+    /* If we need to set sa_len, then we'd best take a copy of the SV */
 #if HAVE_SOCKADDR_SA_LEN
-    sa.sa_len = addr_len;
+    {
+      SV *addr_copy = sv_mortalcopy(addr);
+      sa = (struct sockaddr *) SvPV(addr_copy, addr_len);
+      sa->sa_len = addr_len;
+    }
+#else
+    sa = (struct sockaddr *) SvPV(addr, addr_len);
 #endif
 
-    err = getnameinfo(&sa, addr_len,
+    err = getnameinfo(sa, addr_len,
       SvPV_nolen(host), SvCUR(host) + 1, // Perl doesn't include final NUL
       SvPV_nolen(serv), SvCUR(serv) + 1, // Perl doesn't include final NUL
       flags);
