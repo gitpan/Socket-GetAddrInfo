@@ -3,7 +3,8 @@ use warnings;
 
 use Module::Build;
 
-use ExtUtils::CBuilder;
+eval { require ExtUtils::CBuilder; 1 } or
+   die "OS unsupported";
 
 my $HAVE_SOCKADDR_SA_LEN;
 
@@ -69,7 +70,6 @@ sub Configure
 
    my $gai_test = <<EOF;
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -78,9 +78,9 @@ int main(int argc, char *argv[]) {
   struct addrinfo *res;
   hints.ai_socktype = SOCK_STREAM;
   if(getaddrinfo("127.0.0.1", "80", &hints, &res))
-    exit(1);
+    return 1;
   freeaddrinfo(res);
-  exit(0);
+  return 0;
 }
 EOF
 
@@ -92,13 +92,12 @@ EOF
 
    my $sa_len_test = <<EOF;
 #include <stdlib.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 int main(int argc, char *argv[]) {
    struct sockaddr sa;
    sa.sa_len = 0;
-   exit(0);
+   return 0;
 }
 EOF
 
@@ -118,6 +117,9 @@ my $build = Module::Build->new
                },
    recommends => {
                },
+   configure_requires => {
+                 'ExtUtils::CBuilder' => 0,
+   },
    build_requires => {
                  'ExtUtils::CBuilder' => 0,
                  'Module::Build' => 0,

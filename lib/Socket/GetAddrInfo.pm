@@ -17,7 +17,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.10";
+   our $VERSION = "0.11";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -80,12 +80,14 @@ functions.
 
 =head1 SYNOPSIS
 
+ use Socket qw( SOCK_STREAM );
  use Socket::GetAddrInfo qw( :newapi getaddrinfo getnameinfo );
  use IO::Socket;
 
  my $sock;
 
- my ( $err, @res ) = getaddrinfo( "www.google.com", "www" );
+ my %hints = ( socktype => SOCK_STREAM );
+ my ( $err, @res ) = getaddrinfo( "www.google.com", "www", \%hints );
 
  die "Cannot resolve name - $err" if $err;
 

@@ -1,5 +1,14 @@
 Revision history for Socket-GetAddrInfo
 
+0.11    CHANGES:
+         * Pass "socktype => SOCK_STREAM" hint in example
+         * Use "return 1" rather than "exit(1)" in C code to avoid needing
+           <unistd.h>; may improve builds on non-UNIX platforms
+
+        BUGFIXES:
+         * Declare ExtUtils::CBuilder as a configure_requires dependency, and
+           fail gracefully if it still isn't installed when Build.PL runs
+
 0.10    BUGFIXES:
          * Fixed a bug in getnameinfo() when handling IPv6 addresses, where
            a buffer overrun causes at least a failure from libc, but has the
