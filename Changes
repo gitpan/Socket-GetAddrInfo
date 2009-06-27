@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.12    CHANGES:
+         * Added 'use warnings'
+         * Added 'gai.pl' example
+
 0.11    CHANGES:
          * Pass "socktype => SOCK_STREAM" hint in example
          * Use "return 1" rather than "exit(1)" in C code to avoid needing

@@ -130,6 +130,8 @@ my $build = Module::Build->new
                },
    license => 'perl',
    create_makefile_pl => 'small',
+   create_license => 1,
+   create_readme  => 1,
 
    $CAN_XS ? () : ( xs_files => {} ),
   );

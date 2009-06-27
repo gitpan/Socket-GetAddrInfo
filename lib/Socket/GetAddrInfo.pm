@@ -1,11 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007,2008 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2009 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo;
 
 use strict;
+use warnings;
 
 use Exporter;
 use DynaLoader;
@@ -17,7 +18,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.11";
+   our $VERSION = "0.12";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -557,4 +558,4 @@ Extensions for IPv6
 
 =head1 AUTHOR
 
-Paul Evans E<lt>leonerd@leonerd.org.ukE<gt>
+Paul Evans <leonerd@leonerd.org.uk>

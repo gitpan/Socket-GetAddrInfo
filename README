@@ -1,0 +1,198 @@
+NAME
+    "Socket::GetAddrInfo" - RFC 2553's "getaddrinfo" and "getnameinfo"
+    functions.
+
+SYNOPSIS
+     use Socket qw( SOCK_STREAM );
+     use Socket::GetAddrInfo qw( :newapi getaddrinfo getnameinfo );
+     use IO::Socket;
+
+     my $sock;
+
+     my %hints = ( socktype => SOCK_STREAM );
+     my ( $err, @res ) = getaddrinfo( "www.google.com", "www", \%hints );
+
+     die "Cannot resolve name - $err" if $err;
+
+     while( my $ai = shift @res ) {
+
+        $sock = IO::Socket->new();
+        $sock->socket( $ai->{family}, $ai->{socktype}, $ai->{protocol} ) or
+           undef $sock, next;
+
+        $sock->connect( $ai->{addr} ) or undef $sock, next;
+
+        last;
+     }
+
+     if( $sock ) {
+        my ( $err, $host, $service ) = getnameinfo( $sock->peername );
+        print "Connected to $host:$service\n" if !$err;
+     }
+
+DESCRIPTION
+    The RFC 2553 functions "getaddrinfo" and "getnameinfo" provide an
+    abstracted way to convert between a pair of host name/service name and
+    socket addresses, or vice versa. "getaddrinfo" converts names into a set
+    of arguments to pass to the "socket()" and "connect()" syscalls, and
+    "getnameinfo" converts a socket address back into its host name/service
+    name pair.
+
+    These functions provide a useful interface for performing either of
+    these name resolution operation, without having to deal with IPv4/IPv6
+    transparency, or whether the underlying host can support IPv6 at all, or
+    other such issues. However, not all platforms can support the underlying
+    calls at the C layer, which means a dilema for authors wishing to write
+    forward-compatible code. Either to support these functions, and cause
+    the code not to work on older platforms, or stick to the older "legacy"
+    resolvers such as "gethostbyname()", which means the code becomes more
+    portable.
+
+    This module attempts to solve this problem, by detecting at compiletime
+    whether the underlying OS will support these functions, and only
+    compiling the XS code if it can. At runtime, when the module is loaded,
+    if the XS implementation is not available, emulations of the functions
+    using the legacy resolver functions instead. The emulations support the
+    same interface as the real functions, and behave as close as is
+    resonably possible to emulate using the legacy resolvers. See below for
+    details on the limits of this emulation.
+
+FUNCTIONS
+    The functions in this module are provided in one of two API styles,
+    selectable at the time they are imported into the caller, by the use of
+    the following tags:
+
+     use Socket::GetAddrInfo qw( :newapi getaddrinfo );
+
+     use Socket::GetAddrInfo qw( :Socket6api getaddrinfo );
+
+    The choice is implemented by importing different functions into the
+    caller, which means different importing packages may choose different
+    API styles. It is recommended that new code import the ":newapi" style
+    to take advantage of neater argument / return results, and error
+    reporting. The ":Socket6api" style is provided as backward-compatibility
+    for code that wants to use "Socket6".
+
+    If neither style is selected, then this module will provide a
+    Socket6-like API to be compatible with earlier versions of
+    "Socket::GetAddrInfo". This behaviour will change in a later version of
+    the module - make sure to always specify the required API type.
+
+  ( $err, @res ) = getaddrinfo( $host, $service, $hints )
+    When given both host and service, this function attempts to resolve the
+    host name to a set of network addresses, and the service name into a
+    protocol and port number, and then returns a list of address structures
+    suitable to connect() to it.
+
+    When given just a host name, this function attempts to resolve it to a
+    set of network addresses, and then returns a list of these addresses in
+    the returned structures.
+
+    When given just a service name, this function attempts to resolve it to
+    a protocol and port number, and then returns a list of address
+    structures that represent it suitable to bind() to.
+
+    When given neither name, it generates an error.
+
+    The optional $hints parameter can be passed a HASH reference to indicate
+    how the results are generated. It may contain any of the following four
+    fields:
+
+    flags => INT
+            A bitfield containing "AI_*" constants
+
+    family => INT
+            Restrict to only generating addresses in this address family
+
+    socktype => INT
+            Restrict to only generating addresses of this socket type
+
+    protocol => INT
+            Restrict to only generating addresses for this protocol
+
+    Errors are indicated by the $err value returned; which will be non-zero
+    in numeric context, and contain a string error message as a string. The
+    value can be compared against any of the "EAI_*" constants to determine
+    what the error is.
+
+    If no error occurs, @res will contain HASH references, each representing
+    one address. It will contain the following five fields:
+
+    family => INT
+            The address family (e.g. AF_INET)
+
+    socktype => INT
+            The socket type (e.g. SOCK_STREAM)
+
+    protocol => INT
+            The protocol (e.g. IPPROTO_TCP)
+
+    addr => STRING
+            The address in a packed string (such as would be returned by
+            pack_sockaddr_in)
+
+    canonname => STRING
+            The canonical name for the host if the "AI_CANONNAME" flag was
+            provided, or "undef" otherwise.
+
+  ( $err, $host, $service ) = getnameinfo( $addr, $flags )
+    This function attempts to resolve the given socket address into a pair
+    of host and service names.
+
+    The optional $flags parameter is a bitfield containing "NI_*" constants.
+
+    Errors are indicated by the $err value returned; which will be non-zero
+    in numeric context, and contain a string error message as a string. The
+    value can be compared against any of the "EAI_*" constants to determine
+    what the error is.
+
+SOCKET6 COMPATIBILITY FUNCTIONS
+  @res = getaddrinfo( $host, $service, $family, $socktype, $protocol, $flags )
+    This version of the API takes the hints values as separate ordered
+    parameters. Unspecified parameters should be passed as 0.
+
+    If successful, this function returns a flat list of values, five for
+    each returned address structure. Each group of five elements will
+    contain, in order, the "family", "socktype", "protocol", "addr" and
+    "canonname" values of the address structure.
+
+    If unsuccessful, it will return a single value, containing the string
+    error message. To remain compatible with the "Socket6" interface, this
+    value does not have the error integer part.
+
+  ( $host, $service ) = getnameinfo( $addr, $flags )
+    This version of the API returns only the host name and service name, if
+    successfully resolved. On error, it will return an empty list. To remain
+    compatible with the "Socket6" interface, no error information will be
+    supplied.
+
+LIMITS OF EMULATION
+    These emulations are not a complete replacement of the real functions,
+    because they only support IPv4 (the "AF_INET" socket family).
+
+  getaddrinfo
+    *   If $family is supplied, it must be "AF_INET". Any other value will
+        result in an error thrown by "croak".
+
+    *   The only supported $flags values are "AI_PASSIVE", "AI_CANONNAME",
+        and "AI_NUMERICHOST".
+
+  getnameinfo
+    *   If the sockaddr family of $addr is anything other than "AF_INET", an
+        error will be thrown with "croak".
+
+    *   The only supported $flags values are "NI_NUMERICHOST",
+        "NI_NUMERICSERV", "NI_NAMEREQD" and "NI_DGRAM".
+
+BUGS
+    *   At the time of writing, there are no test reports from the "MSWin32"
+        platform either PASS or FAIL. I suspect the code will not currently
+        work as it stands on that platform, but it should be fairly easy to
+        fix, as "Socket6" is known to work there. Patches welcomed. :)
+
+SEE ALSO
+    *   RFC 2553 - Basic Socket Interface Extensions for IPv6
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+
