@@ -127,6 +127,7 @@ my $build = Module::Build->new
                  'Scalar::Util' => 0,
                  'Test::More' => 0,
                  'Test::Exception' => 0,
+                 'Test::Warn' => 0,
                },
    license => 'perl',
    create_makefile_pl => 'small',

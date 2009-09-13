@@ -18,7 +18,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.12";
+   our $VERSION = "0.13";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -140,21 +140,22 @@ sub import
    my $class = shift;
    my %symbols = map { $_ => 1 } @_;
 
-   if( delete $symbols{':newapi'} ) {
-      # Caller wants the new API functions - do nothing
-   }
-   else {
-      # Caller wants the Socket6 backward compatible API functions instead
-      delete $symbols{':Socket6api'} or carp <<EOF;
+   my $api;
+   $api = "new"     if delete $symbols{':newapi'};
+   $api = "Socket6" if delete $symbols{':Socket6api'};
+
+   if( $symbols{getaddrinfo} or $symbols{getnameinfo} ) {
+      defined $api or carp <<EOF;
 Importing Socket::GetAddrInfo without ':newapi' or ':Socket6api' tag.
 Defaults to :Socket6api currently but default will change in a future version.
 EOF
+      if( !defined $api or $api eq "Socket6" ) {
+         my $callerpkg = caller;
 
-      my $callerpkg = caller;
-
-      no strict 'refs';
-      *{"${callerpkg}::getaddrinfo"} = \&Socket6_getaddrinfo if delete $symbols{getaddrinfo};
-      *{"${callerpkg}::getnameinfo"} = \&Socket6_getnameinfo if delete $symbols{getnameinfo};
+         no strict 'refs';
+         *{"${callerpkg}::getaddrinfo"} = \&Socket6_getaddrinfo if delete $symbols{getaddrinfo};
+         *{"${callerpkg}::getnameinfo"} = \&Socket6_getnameinfo if delete $symbols{getnameinfo};
+      }
    }
 
    return unless keys %symbols;
@@ -551,8 +552,8 @@ to work there. Patches welcomed. :)
 
 =item *
 
-L<RFC 2553|http://tools.ietf.org/html/rfc2553> - Basic Socket Interface
-Extensions for IPv6
+L<http://tools.ietf.org/html/rfc2553> - Basic Socket Interface Extensions for
+IPv6
 
 =back
 

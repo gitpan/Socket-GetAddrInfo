@@ -191,7 +191,8 @@ BUGS
         fix, as "Socket6" is known to work there. Patches welcomed. :)
 
 SEE ALSO
-    *   RFC 2553 - Basic Socket Interface Extensions for IPv6
+    *   <http://tools.ietf.org/html/rfc2553> - Basic Socket Interface
+        Extensions for IPv6
 
 AUTHOR
     Paul Evans <leonerd@leonerd.org.uk>
