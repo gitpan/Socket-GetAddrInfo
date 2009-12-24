@@ -1,8 +1,11 @@
 ---
 name: Socket-GetAddrInfo
-version: 0.13
+version: 0.14
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
+  - |-
+    With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs in the
+    XS code.
 abstract: |-
   RFC 2553's C<getaddrinfo> and C<getnameinfo>
   functions.
@@ -23,7 +26,7 @@ configure_requires:
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.13
+    version: 0.14
 generated_by: Module::Build version 0.35
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html

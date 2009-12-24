@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.14    BUGFIXES:
+         * Don't leak memory on getnameinfo() failures
+         * Avoid possible sockaddr alignment errors by allocating/copying a
+           new buffer
+         (thanks to Zefram)
+
 0.13    CHANGES:
          * Don't warn if only importing symbolic constants; test this
          * Added Test::Pod testing

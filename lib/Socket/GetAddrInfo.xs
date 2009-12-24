@@ -12,6 +12,11 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+// Newx was new in 5.9.3
+#ifndef Newx
+# define Newx(p,n,t) New(0,p,n,t)
+#endif
+
 SV *err_to_SV(int err)
 {
   SV *ret = sv_newmortal();
@@ -174,41 +179,39 @@ getnameinfo(addr, flags=0)
     int  flags
 
   PREINIT:
-    SV *host;
-    SV *serv;
-    struct sockaddr *sa;
+    char host[1024];
+    char serv[256];
+    char *sa; /* we'll cast to struct sockaddr * when necessary */
     STRLEN addr_len;
     int err;
 
   PPCODE:
-    host = newSVpvn("", 1023);
-    serv = newSVpvn("", 255);
+    if(!SvPOK(addr))
+      croak("addr is not a string");
 
-    /* If we need to set sa_len, then we'd best take a copy of the SV */
+    addr_len = SvCUR(addr);
+
+    /* We need to ensure the sockaddr is aligned, because a random SvPV might
+     * not be due to SvOOK */
+    Newx(sa, addr_len, char);
+    Copy(SvPV_nolen(addr), sa, addr_len, char);
 #if HAVE_SOCKADDR_SA_LEN
-    {
-      SV *addr_copy = sv_mortalcopy(addr);
-      sa = (struct sockaddr *) SvPV(addr_copy, addr_len);
-      sa->sa_len = addr_len;
-    }
-#else
-    sa = (struct sockaddr *) SvPV(addr, addr_len);
+    ((struct sockaddr *)sa)->sa_len = addr_len;
 #endif
 
-    err = getnameinfo(sa, addr_len,
-      SvPV_nolen(host), SvCUR(host) + 1, // Perl doesn't include final NUL
-      SvPV_nolen(serv), SvCUR(serv) + 1, // Perl doesn't include final NUL
+    err = getnameinfo((struct sockaddr *)sa, addr_len,
+      host, sizeof(host),
+      serv, sizeof(serv),
       flags);
+
+    Safefree(sa);
 
     XPUSHs(err_to_SV(err));
 
     if(err)
       XSRETURN(1);
 
-    SvCUR_set(host, strlen(SvPV_nolen(host)));
-    SvCUR_set(serv, strlen(SvPV_nolen(serv)));
-
-    XPUSHs(sv_2mortal(host));
-    XPUSHs(sv_2mortal(serv));
+    XPUSHs(sv_2mortal(newSVpv(host, 0)));
+    XPUSHs(sv_2mortal(newSVpv(serv, 0)));
 
     XSRETURN(3);

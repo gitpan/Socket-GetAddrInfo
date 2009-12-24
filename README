@@ -197,3 +197,6 @@ SEE ALSO
 AUTHOR
     Paul Evans <leonerd@leonerd.org.uk>
 
+    With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs
+    in the XS code.
+

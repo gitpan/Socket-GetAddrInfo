@@ -18,7 +18,7 @@ my %errstr;
 
 BEGIN {
    our @ISA = qw( Exporter );
-   our $VERSION = "0.13";
+   our $VERSION = "0.14";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -560,3 +560,6 @@ IPv6
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs in the
+XS code.

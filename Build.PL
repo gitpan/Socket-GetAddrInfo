@@ -4,7 +4,7 @@ use warnings;
 use Module::Build;
 
 eval { require ExtUtils::CBuilder; 1 } or
-   die "OS unsupported";
+   die "OS unsupported - missing ExtUtils::CBuilder";
 
 my $HAVE_SOCKADDR_SA_LEN;
 
