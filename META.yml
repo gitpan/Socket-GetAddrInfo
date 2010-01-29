@@ -1,19 +1,10 @@
 ---
-name: Socket-GetAddrInfo
-version: 0.14
+abstract: "RFC 2553's C<getaddrinfo> and C<getnameinfo>\nfunctions."
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
-  - |-
-    With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs in the
-    XS code.
-abstract: |-
-  RFC 2553's C<getaddrinfo> and C<getnameinfo>
-  functions.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
   ExtUtils::CBuilder: 0
+  ExtUtils::CChecker: 0
   Module::Build: 0
   Module::Build::Compat: 0
   Scalar::Util: 0
@@ -21,13 +12,20 @@ build_requires:
   Test::More: 0
   Test::Warn: 0
 configure_requires:
-  ExtUtils::CBuilder: 0
-  Module::Build: 0.35
-provides:
-  Socket::GetAddrInfo:
-    file: lib/Socket/GetAddrInfo.pm
-    version: 0.14
-generated_by: Module::Build version 0.35
+  ExtUtils::CChecker: 0
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
+name: Socket-GetAddrInfo
+provides:
+  Socket::GetAddrInfo:
+    file: lib/Socket/GetAddrInfo.pm
+    version: 0.15
+requires:
+  XSLoader: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.15

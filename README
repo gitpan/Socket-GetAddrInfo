@@ -194,9 +194,10 @@ SEE ALSO
     *   <http://tools.ietf.org/html/rfc2553> - Basic Socket Interface
         Extensions for IPv6
 
-AUTHOR
-    Paul Evans <leonerd@leonerd.org.uk>
-
+ACKNOWLEDGEMENTS
     With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs
     in the XS code.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
 

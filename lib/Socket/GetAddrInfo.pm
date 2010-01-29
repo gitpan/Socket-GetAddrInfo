@@ -8,32 +8,24 @@ package Socket::GetAddrInfo;
 use strict;
 use warnings;
 
-use Exporter;
-use DynaLoader;
-
 use Carp;
+
 use Scalar::Util qw( dualvar );
 
 my %errstr;
 
 BEGIN {
-   our @ISA = qw( Exporter );
-   our $VERSION = "0.14";
+   our $VERSION = "0.15";
 
    our @EXPORT = qw(
       getaddrinfo
       getnameinfo
    );
 
-   push @ISA, qw( DynaLoader ); # Must be last so we can pop it if necessary
-
-   if( not $ENV{NO_GETADDRINFO_XS} and eval { __PACKAGE__->DynaLoader::bootstrap( $VERSION ); 1 } ) {
+   if( not $ENV{NO_GETADDRINFO_XS} and eval { require XSLoader; XSLoader::load( __PACKAGE__, $VERSION ); 1 } ) {
       # Do nothing
    }
    else {
-      # Not a DynaLoader any more
-      pop @ISA;
-
       *getaddrinfo = \&fake_getaddrinfo;
       *getnameinfo = \&fake_getnameinfo;
 
@@ -160,8 +152,10 @@ EOF
 
    return unless keys %symbols;
 
+   require Exporter;
+
    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
-   $class->SUPER::import( keys %symbols );
+   Exporter::import( $class, keys %symbols );
 }
 
 =head1 FUNCTIONS
@@ -557,9 +551,11 @@ IPv6
 
 =back
 
-=head1 AUTHOR
-
-Paul Evans <leonerd@leonerd.org.uk>
+=head1 ACKNOWLEDGEMENTS
 
 With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs in the
 XS code.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

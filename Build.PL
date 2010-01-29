@@ -3,56 +3,10 @@ use warnings;
 
 use Module::Build;
 
-eval { require ExtUtils::CBuilder; 1 } or
-   die "OS unsupported - missing ExtUtils::CBuilder";
+eval { require ExtUtils::CChecker; 1 } or
+   die "OS unsupported - missing ExtUtils::CChecker";
 
 my $HAVE_SOCKADDR_SA_LEN;
-
-sub try_compile_run
-{
-   my ( $cbuilder, $name, $source ) = @_;
-
-   my $test_source = "test-$name.c";
-
-   open( my $test_source_fh, "> $test_source" ) or die "Cannot write $test_source - $!";
-
-   print $test_source_fh $source;
-
-   close $test_source_fh;
-
-   my $test_obj = eval { $cbuilder->compile( source => $test_source ) };
-
-   unlink $test_source;
-
-   if( not defined $test_obj ) {
-      print "\nFailed to compile $test_source\n";
-      return 0;
-   }
-
-   print "Compiled $test_source to $test_obj\n\n";
-
-   my $test_exe = eval { $cbuilder->link_executable( objects => $test_obj ) };
-   END { defined $test_exe and -f $test_exe and unlink $test_exe; }
-
-   unlink $test_obj;
-
-   if( not defined $test_exe ) {
-      print "\nFailed to link $test_obj to an executable\n";
-      return 0;
-   }
-
-   print "Linked $test_obj to $test_exe\n\n";
-
-   if( system( "./$test_exe" ) != 0 ) {
-      print "\nFailed to run $test_exe\n";
-      unlink $test_exe;
-      return 0;
-   }
-
-   unlink $test_exe;
-
-   return 1;
-}
 
 sub Configure
 {
@@ -61,10 +15,7 @@ sub Configure
       return 0;
    }
 
-   my $cbuilder = ExtUtils::CBuilder->new();
-
-   print "Detecting if the environment has a C compiler...\n";
-   return 0 unless $cbuilder->have_compiler;
+   my $cc = ExtUtils::CChecker->new();
 
    print "\nDetecting if libc supports getaddrinfo()...\n";
 
@@ -84,7 +35,7 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   return 0 unless try_compile_run( $cbuilder, "getaddrinfo", $gai_test );
+   return 0 unless $cc->try_compile_run( source => $gai_test );
 
    print "\nLooks like the libc supports getaddrinfo()\n";
 
@@ -101,7 +52,7 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   $HAVE_SOCKADDR_SA_LEN = try_compile_run( $cbuilder, "sa_len", $sa_len_test );
+   $HAVE_SOCKADDR_SA_LEN = $cc->try_compile_run( source => $sa_len_test );
 
    return 1;
 }
@@ -114,21 +65,20 @@ my $build = Module::Build->new
    dist_version_from => 'lib/Socket/GetAddrInfo.pm',
    extra_compiler_flags => [ "-DHAVE_SOCKADDR_SA_LEN=$HAVE_SOCKADDR_SA_LEN" ],
    requires => {
-               },
-   recommends => {
-               },
+      'XSLoader' => 0,
+   },
    configure_requires => {
-                 'ExtUtils::CBuilder' => 0,
+      'ExtUtils::CChecker' => 0,
    },
    build_requires => {
-                 'ExtUtils::CBuilder' => 0,
-                 'Module::Build' => 0,
-                 'Module::Build::Compat' => 0,
-                 'Scalar::Util' => 0,
-                 'Test::More' => 0,
-                 'Test::Exception' => 0,
-                 'Test::Warn' => 0,
-               },
+      'ExtUtils::CChecker' => 0,
+      'Module::Build' => 0,
+      'Module::Build::Compat' => 0,
+      'Scalar::Util' => 0,
+      'Test::More' => 0,
+      'Test::Exception' => 0,
+      'Test::Warn' => 0,
+   },
    license => 'perl',
    create_makefile_pl => 'small',
    create_license => 1,
