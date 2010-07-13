@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.16    CHANGES:
+         * Accept undef as absent host/service name, as well as ""
+
+        BUGFIXES:
+         * Need -lsocket on some OSes; hunt it using ExtUtils::CChecker
+
 0.15    CHANGES:
          * Use XSLoader instead of DynaLoader
          * import Exporter::import instead of @ISAing it

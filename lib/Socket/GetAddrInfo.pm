@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2009 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2010 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo;
 
@@ -15,7 +15,7 @@ use Scalar::Util qw( dualvar );
 my %errstr;
 
 BEGIN {
-   our $VERSION = "0.15";
+   our $VERSION = "0.16";
 
    our @EXPORT = qw(
       getaddrinfo

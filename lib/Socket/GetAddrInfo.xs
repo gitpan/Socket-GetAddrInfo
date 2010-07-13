@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2008,2009 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2008-2010 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -111,12 +111,14 @@ BOOT:
   setup_constants();
 
 void
-getaddrinfo(host, service, hints=NULL)
-    char *host
-    char *service
+getaddrinfo(host=NULL, service=NULL, hints=NULL)
+    SV   *host
+    SV   *service
     SV   *hints
 
   PREINIT:
+    char *hostname = NULL;
+    char *servicename = NULL;
     struct addrinfo hints_s = { 0 };
     struct addrinfo *res;
     struct addrinfo *res_iter;
@@ -124,6 +126,12 @@ getaddrinfo(host, service, hints=NULL)
     int n_res;
 
   PPCODE:
+    if(SvOK(host) && SvCUR(host))
+      hostname = SvPV_nolen(host);
+
+    if(SvOK(service) && SvCUR(service))
+      servicename = SvPV_nolen(service);
+
     if(hints && SvOK(hints)) {
       HV *hintshash;
       SV **valp;
@@ -143,7 +151,7 @@ getaddrinfo(host, service, hints=NULL)
         hints_s.ai_protocol = SvIV(*valp);
     }
 
-    err = getaddrinfo(host[0] ? host : NULL, service[0] ? service : NULL, &hints_s, &res);
+    err = getaddrinfo(hostname, servicename, &hints_s, &res);
 
     XPUSHs(err_to_SV(err));
 
@@ -195,7 +203,7 @@ getnameinfo(addr, flags=0)
      * not be due to SvOOK */
     Newx(sa, addr_len, char);
     Copy(SvPV_nolen(addr), sa, addr_len, char);
-#if HAVE_SOCKADDR_SA_LEN
+#ifdef HAVE_SOCKADDR_SA_LEN
     ((struct sockaddr *)sa)->sa_len = addr_len;
 #endif
 

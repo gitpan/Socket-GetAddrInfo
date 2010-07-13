@@ -5,21 +5,26 @@ use Module::Build;
 
 eval { require ExtUtils::CChecker; 1 } or
    die "OS unsupported - missing ExtUtils::CChecker";
+eval { ExtUtils::CChecker->VERSION( 0.04 ) } or
+   die "OS unsupported - ExtUtils::CChecker too old; need at least 0.04";
 
+my $cc = ExtUtils::CChecker->new();
+
+my $CAN_XS = 0;
 my $HAVE_SOCKADDR_SA_LEN;
 
-sub Configure
-{
+TRY_XS: {
    if( $ENV{NO_XS} ) {
       print "\$ENV{NO_XS} is set - XS code will be disabled\n";
-      return 0;
+      last TRY_XS;
    }
-
-   my $cc = ExtUtils::CChecker->new();
 
    print "\nDetecting if libc supports getaddrinfo()...\n";
 
-   my $gai_test = <<EOF;
+   last TRY_XS unless $cc->try_find_libs_for(
+      # Solaris et.al. use -lsocket or -lsocket -lnsl
+      libs => [ "", "socket", "socket nsl" ],
+      source => <<'EOF' );
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -35,13 +40,15 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   return 0 unless $cc->try_compile_run( source => $gai_test );
+   $CAN_XS = 1;
 
    print "\nLooks like the libc supports getaddrinfo()\n";
 
    print "Detecting if sockaddr has sa_len field...\n";
 
-   my $sa_len_test = <<EOF;
+   $cc->try_compile_run(
+      define => "HAVE_SOCKADDR_SA_LEN",
+      source => <<'EOF' );
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -51,27 +58,19 @@ int main(int argc, char *argv[]) {
    return 0;
 }
 EOF
-
-   $HAVE_SOCKADDR_SA_LEN = $cc->try_compile_run( source => $sa_len_test );
-
-   return 1;
 }
 
-my $CAN_XS = Configure();
-
-my $build = Module::Build->new
-  (
+my $build = $cc->new_module_build(
    module_name => 'Socket::GetAddrInfo',
    dist_version_from => 'lib/Socket/GetAddrInfo.pm',
-   extra_compiler_flags => [ "-DHAVE_SOCKADDR_SA_LEN=$HAVE_SOCKADDR_SA_LEN" ],
    requires => {
       'XSLoader' => 0,
    },
    configure_requires => {
-      'ExtUtils::CChecker' => 0,
+      'ExtUtils::CChecker' => '0.04',
    },
    build_requires => {
-      'ExtUtils::CChecker' => 0,
+      'ExtUtils::CChecker' => '0.04',
       'Module::Build' => 0,
       'Module::Build::Compat' => 0,
       'Scalar::Util' => 0,
@@ -85,6 +84,6 @@ my $build = Module::Build->new
    create_readme  => 1,
 
    $CAN_XS ? () : ( xs_files => {} ),
-  );
+);
 
 $build->create_build_script;

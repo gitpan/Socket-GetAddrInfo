@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 24;
+use Test::More tests => 28;
 use Test::Exception;
 
 use Socket::GetAddrInfo qw( :newapi getaddrinfo AI_NUMERICHOST );
@@ -97,10 +97,19 @@ ok( $res[0]->{protocol} == 0 || $res[0]->{protocol} == IPPROTO_TCP,
 is_sinaddr( $res[0]->{addr}, 80, inet_aton( "127.0.0.1" ),
    '$res[0] addr is {"127.0.0.1", 0}' );
 
+# Check actual IV integers work just as well as PV strings
+( $err, @res ) = getaddrinfo( "127.0.0.1", 80, { socktype => SOCK_STREAM } );
+is_err( $err, 0,  '$err == 0 for host=127.0.0.1/service=80/socktype=STREAM' );
+is_sinaddr( $res[0]->{addr}, 80, inet_aton( "127.0.0.1" ),
+   '$res[0] addr is {"127.0.0.1", 0}' );
+
 ( $err, @res ) = getaddrinfo( "127.0.0.1", "" );
 is_err( $err, 0,  '$err == 0 for host=127.0.0.1' );
 # Might get more than one; e.g. different socktypes
 ok( scalar @res > 0, '@res has results' );
+
+( $err, @res ) = getaddrinfo( "127.0.0.1", undef );
+is_err( $err, 0,  '$err == 0 for host=127.0.0.1' );
 
 # Just pick the first one
 is( $res[0]->{family}, AF_INET,
@@ -119,6 +128,9 @@ is( $res[0]->{socktype}, SOCK_STREAM,
    '$res[0] socktype is SOCK_STREAM' );
 ok( $res[0]->{protocol} == 0 || $res[0]->{protocol} == IPPROTO_TCP,
    '$res[0] protocol is 0 or IPPROTO_TCP' );
+
+( $err, @res ) = getaddrinfo( undef, "80", { family => AF_INET, socktype => SOCK_STREAM } );
+is_err( $err, 0,  '$err == 0 for service=80/family=AF_INET/socktype=STREAM' );
 
 # Now some tests of a few well-known internet hosts
 
