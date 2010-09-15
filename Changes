@@ -1,5 +1,8 @@
 Revision history for Socket-GetAddrInfo
 
+0.17    BUGFIXES:
+         * Fix 'protocol' hint to getaddrinfo()
+
 0.16    CHANGES:
          * Accept undef as absent host/service name, as well as ""
 

@@ -23,6 +23,16 @@ GetOptions(
    'stream' => sub { $hints{socktype} = SOCK_STREAM },
    'dgram'  => sub { $hints{socktype} = SOCK_DGRAM },
 
+   'proto=s' => sub {
+      my $proto = $_[1];
+      unless( $proto =~ m/^\d+$/ ) {
+         my $protonum = getprotobyname( $proto );
+         defined $protonum or die "No such protocol - $proto\n";
+         $proto = $protonum;
+      }
+      $hints{protocol} = $proto;
+   },
+
    'passive' => sub { $hints{flags} ||= AI_PASSIVE },
 ) or exit 1;
 

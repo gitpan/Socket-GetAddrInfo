@@ -147,7 +147,7 @@ getaddrinfo(host=NULL, service=NULL, hints=NULL)
         hints_s.ai_family = SvIV(*valp);
       if((valp = hv_fetch(hintshash, "socktype", 8, 0)) != NULL)
         hints_s.ai_socktype = SvIV(*valp);
-      if((valp = hv_fetch(hintshash, "protocol", 5, 0)) != NULL)
+      if((valp = hv_fetch(hintshash, "protocol", 8, 0)) != NULL)
         hints_s.ai_protocol = SvIV(*valp);
     }
 
