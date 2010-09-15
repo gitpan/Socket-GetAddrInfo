@@ -119,6 +119,7 @@ getaddrinfo(host=NULL, service=NULL, hints=NULL)
   PREINIT:
     char *hostname = NULL;
     char *servicename = NULL;
+    STRLEN len;
     struct addrinfo hints_s = { 0 };
     struct addrinfo *res;
     struct addrinfo *res_iter;
@@ -129,7 +130,8 @@ getaddrinfo(host=NULL, service=NULL, hints=NULL)
     if(SvOK(host) && SvCUR(host))
       hostname = SvPV_nolen(host);
 
-    if(SvOK(service) && SvCUR(service))
+    /* This might be numeric so we may have to stringify it */
+    if(SvOK(service) && (SvCUR(service) || SvPV(service, len) && len))
       servicename = SvPV_nolen(service);
 
     if(hints && SvOK(hints)) {

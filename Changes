@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.18    BUGFIXES:
+         * Fix plain number passing for getaddrinfo()'s service on perl
+           versions <5.10.0
+
 0.17    BUGFIXES:
          * Fix 'protocol' hint to getaddrinfo()
 
