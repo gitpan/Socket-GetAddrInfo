@@ -2,7 +2,7 @@
 
 use strict;
 
-use Test::More tests => 28;
+use Test::More tests => 39;
 use Test::Exception;
 
 use Socket::GetAddrInfo qw( :newapi getaddrinfo AI_NUMERICHOST );
@@ -24,7 +24,7 @@ sub is_sinaddr
       return;
    }
 
-   if( $port != $expect_port ) {
+   if( defined $expect_port && $port != $expect_port ) {
       diag( "Expected port $expect_port, got $port" );
       fail( $message );
       return;
@@ -111,6 +111,40 @@ ok( scalar @res > 0, '@res has results' );
 ( $err, @res ) = getaddrinfo( "127.0.0.1", undef );
 is_err( $err, 0,  '$err == 0 for host=127.0.0.1' );
 
+{
+   "127.0.0.1" =~ /(.+)/;
+   ( $err, @res ) = getaddrinfo($1, undef);
+   is_err( $err, 0,  '$err == 0 for host=$1' );
+   ok( scalar @res > 0, '@res has results' );
+   is_sinaddr( $res[0]->{addr}, undef, inet_aton( "127.0.0.1" ),
+      '$res[0] addr is "127.0.0.1"');
+}
+
+{
+    package MyString;
+    use overload '""' => sub { ${ $_[0] } }, fallback => 1;
+    sub new {
+       my ($class, $string) = @_;
+       return bless \$string, $class;
+    }
+}
+
+{
+   ( $err, @res ) = getaddrinfo(MyString->new("127.0.0.1"), undef);
+   is_err( $err, 0,  '$err == 0 for host=MyString->new("127.0.0.1")' );
+   ok( scalar @res > 0, '@res has results' );
+   is_sinaddr( $res[0]->{addr}, undef, inet_aton( "127.0.0.1" ),
+      '$res[0] addr is "127.0.0.1"');
+}
+
+{
+   ( $err, @res ) = getaddrinfo(substr("127.0.0.1", 0, 9), undef);
+   is_err( $err, 0,  '$err == 0 for host=substr("127.0.0.1", 0, 9)' );
+   ok( scalar @res > 0, '@res has results' );
+   is_sinaddr( $res[0]->{addr}, undef, inet_aton( "127.0.0.1" ),
+      '$res[0] addr is "127.0.0.1"');
+}
+
 # Just pick the first one
 is( $res[0]->{family}, AF_INET,
    '$res[0] family is AF_INET' );
@@ -186,3 +220,11 @@ dies_ok( sub { getaddrinfo( "127.0.0.1", "80", "hints" ) },
          'getaddrinfo() with string hints dies' );
 dies_ok( sub { getaddrinfo( "127.0.0.1", "80", [] ) },
          'getaddrinfo() with ARRAY hints dies' );
+
+# Ensure it doesn't segfault if args are missing
+
+( $err, @res ) = getaddrinfo();
+ok( defined $err, '$err defined for getaddrinfo()' );
+
+( $err, @res ) = getaddrinfo( "127.0.0.1" );
+ok( defined $err, '$err defined for getaddrinfo("127.0.0.1")' );

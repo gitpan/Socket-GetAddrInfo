@@ -8,9 +8,14 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#endif
 
 // Newx was new in 5.9.3
 #ifndef Newx
@@ -111,7 +116,7 @@ BOOT:
   setup_constants();
 
 void
-getaddrinfo(host=NULL, service=NULL, hints=NULL)
+getaddrinfo(host=&PL_sv_undef, service=&PL_sv_undef, hints=NULL)
     SV   *host
     SV   *service
     SV   *hints
@@ -127,12 +132,19 @@ getaddrinfo(host=NULL, service=NULL, hints=NULL)
     int n_res;
 
   PPCODE:
-    if(SvOK(host) && SvCUR(host))
-      hostname = SvPV_nolen(host);
+    SvGETMAGIC(host);
+    if(SvOK(host)) {
+      hostname = SvPV_nomg(host, len);
+      if (!len)
+        hostname = NULL;
+    }
 
-    /* This might be numeric so we may have to stringify it */
-    if(SvOK(service) && (SvCUR(service) || SvPV(service, len) && len))
-      servicename = SvPV_nolen(service);
+    SvGETMAGIC(service);
+    if(SvOK(service)) {
+      servicename = SvPV_nomg(service, len);
+      if (!len)
+        servicename = NULL;
+    }
 
     if(hints && SvOK(hints)) {
       HV *hintshash;

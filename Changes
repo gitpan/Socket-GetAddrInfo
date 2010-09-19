@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.18_001 BUGFIXES:
+         * Handle magic in getaddrinfo() args [chansen]
+         * Win32 build fixes [chansen]
+
 0.18    BUGFIXES:
          * Fix plain number passing for getaddrinfo()'s service on perl
            versions <5.10.0

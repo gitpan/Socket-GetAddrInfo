@@ -23,18 +23,37 @@ TRY_XS: {
 
    last TRY_XS unless $cc->try_find_libs_for(
       # Solaris et.al. use -lsocket or -lsocket -lnsl
-      libs => [ "", "socket", "socket nsl" ],
+      libs => [ "", "socket", "socket nsl", "ws2_32" ],
       source => <<'EOF' );
 #include <stdlib.h>
+#include <stdio.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#endif
+
 int main(int argc, char *argv[]) {
   struct addrinfo hints = { 0 };
   struct addrinfo *res;
-  hints.ai_socktype = SOCK_STREAM;
-  if(getaddrinfo("127.0.0.1", "80", &hints, &res))
+  int rc;
+#ifdef _WIN32
+  WSADATA wsadata;
+  rc = WSAStartup(MAKEWORD(2, 0), &wsadata);
+  if (rc != 0) {
+    printf("WSAStartup() failed: %d\n", rc);
     return 1;
+  }
+#endif
+  hints.ai_socktype = SOCK_STREAM;
+  rc = getaddrinfo("127.0.0.1", "80", &hints, &res);
+  if (rc != 0) {
+    printf("getaddrinfo() failed: %d\n", rc);
+    return 1;
+  }
   freeaddrinfo(res);
   return 0;
 }
@@ -50,8 +69,14 @@ EOF
       define => "HAVE_SOCKADDR_SA_LEN",
       source => <<'EOF' );
 #include <stdlib.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
+#endif
 int main(int argc, char *argv[]) {
    struct sockaddr sa;
    sa.sa_len = 0;
@@ -82,8 +107,7 @@ my $build = $cc->new_module_build(
    create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
-
-   $CAN_XS ? () : ( xs_files => {} ),
+   xs_files => $CAN_XS ? { ('lib/Socket/GetAddrInfo.xs') x 2 } : {},
 );
 
 $build->create_build_script;
