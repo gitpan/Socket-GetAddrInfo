@@ -15,7 +15,7 @@ use Scalar::Util qw( dualvar );
 my %errstr;
 
 BEGIN {
-   our $VERSION = "0.18_001";
+   our $VERSION = "0.18_002";
 
    our @EXPORT = qw(
       getaddrinfo

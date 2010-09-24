@@ -185,7 +185,7 @@ getaddrinfo(host=&PL_sv_undef, service=&PL_sv_undef, hints=NULL)
       if(res_iter->ai_canonname)
         hv_store(res_hv, "canonname", 9, newSVpv(res_iter->ai_canonname, 0), 0);
       else
-        hv_store(res_hv, "canonname", 9, &PL_sv_undef, 0);
+        hv_store(res_hv, "canonname", 9, newSV(0), 0);
 
       XPUSHs(sv_2mortal(newRV_noinc((SV*)res_hv)));
       n_res++;

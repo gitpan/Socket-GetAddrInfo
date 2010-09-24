@@ -1,5 +1,8 @@
 Revision history for Socket-GetAddrInfo
 
+0.18_002 BUGFIXES:
+         * Can't store &PL_sv_undef in an HV; store newSV(0) instead
+
 0.18_001 BUGFIXES:
          * Handle magic in getaddrinfo() args [chansen]
          * Win32 build fixes [chansen]
