@@ -195,8 +195,11 @@ SEE ALSO
         Extensions for IPv6
 
 ACKNOWLEDGEMENTS
-    With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs
-    in the XS code.
+    Christian Hansen <chansen@cpan.org> - for help with some XS features and
+    Win32 build fixes.
+
+    Zefram <zefram@fysh.org> - for help with fixing some bugs in the XS
+    code.
 
 AUTHOR
     Paul Evans <leonerd@leonerd.org.uk>

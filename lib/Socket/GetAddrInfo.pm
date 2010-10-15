@@ -15,7 +15,7 @@ use Scalar::Util qw( dualvar );
 my %errstr;
 
 BEGIN {
-   our $VERSION = "0.18_002";
+   our $VERSION = "0.19";
 
    our @EXPORT = qw(
       getaddrinfo
@@ -553,8 +553,10 @@ IPv6
 
 =head1 ACKNOWLEDGEMENTS
 
-With thanks to Zefram <zefram@fysh.org> for help with fixing some bugs in the
-XS code.
+Christian Hansen <chansen@cpan.org> - for help with some XS features and Win32
+build fixes.
+
+Zefram <zefram@fysh.org> - for help with fixing some bugs in the XS code.
 
 =head1 AUTHOR
 
