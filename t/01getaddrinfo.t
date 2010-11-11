@@ -3,7 +3,6 @@
 use strict;
 
 use Test::More tests => 39;
-use Test::Exception;
 
 use Socket::GetAddrInfo qw( :newapi getaddrinfo AI_NUMERICHOST );
 
@@ -214,11 +213,11 @@ ok( $err != 0, '$err != 0 for host=127.0.0.1/service=ZZgetaddrinfoNameTest/sockt
 ok( $err != 0, '$err != 0 for host=localhost/service=ftp/flags=AI_NUMERICHOST/socktype=SOCK_STREAM' );
 
 # Some sanity checking on the hints hash
-lives_ok( sub { getaddrinfo( "127.0.0.1", "80", undef ) },
+ok( defined eval { getaddrinfo( "127.0.0.1", "80", undef ); 1 },
          'getaddrinfo() with undef hints works' );
-dies_ok( sub { getaddrinfo( "127.0.0.1", "80", "hints" ) },
+ok( !defined eval { getaddrinfo( "127.0.0.1", "80", "hints" ); 1 },
          'getaddrinfo() with string hints dies' );
-dies_ok( sub { getaddrinfo( "127.0.0.1", "80", [] ) },
+ok( !defined eval { getaddrinfo( "127.0.0.1", "80", [] ); 1 },
          'getaddrinfo() with ARRAY hints dies' );
 
 # Ensure it doesn't segfault if args are missing

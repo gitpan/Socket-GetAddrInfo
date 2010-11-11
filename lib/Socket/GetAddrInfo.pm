@@ -15,17 +15,16 @@ use Scalar::Util qw( dualvar );
 my %errstr;
 
 BEGIN {
-   our $VERSION = "0.19";
+   our $VERSION = "0.19_001";
 
    our @EXPORT = qw(
       getaddrinfo
       getnameinfo
    );
 
-   if( not $ENV{NO_GETADDRINFO_XS} and eval { require XSLoader; XSLoader::load( __PACKAGE__, $VERSION ); 1 } ) {
-      # Do nothing
-   }
-   else {
+   XSLoader::load(__PACKAGE__, $VERSION );
+
+   if( !defined &getaddrinfo ) {
       *getaddrinfo = \&fake_getaddrinfo;
       *getnameinfo = \&fake_getnameinfo;
 
@@ -118,12 +117,11 @@ platforms, or stick to the older "legacy" resolvers such as
 C<gethostbyname()>, which means the code becomes more portable.
 
 This module attempts to solve this problem, by detecting at compiletime
-whether the underlying OS will support these functions, and only compiling the
-XS code if it can. At runtime, when the module is loaded, if the XS
-implementation is not available, emulations of the functions using the legacy
-resolver functions instead. The emulations support the same interface as the
-real functions, and behave as close as is resonably possible to emulate using
-the legacy resolvers. See below for details on the limits of this emulation.
+whether the underlying OS will support these functions. If it does not, the
+module will use emulations of the functions using the legacy resolver
+functions instead. The emulations support the same interface as the real
+functions, and behave as close as is resonably possible to emulate using the
+legacy resolvers. See below for details on the limits of this emulation.
 
 =cut
 

@@ -8,8 +8,8 @@ use_ok( "Socket::GetAddrInfo", ':newapi' ); # Tag to avoid the deprecation warni
 # Declare which case is being used; can be useful in test reports
 
 if( \&Socket::GetAddrInfo::getaddrinfo == \&Socket::GetAddrInfo::fake_getaddrinfo ) {
-   diag "Using faked PP code as XS failed to load";
+   diag "Using emulation using legacy resolvers";
 }
 else {
-   diag "Using native XS code";
+   diag "Using native getaddrinfo(3)";
 }

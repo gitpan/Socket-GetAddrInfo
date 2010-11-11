@@ -10,21 +10,13 @@ eval { ExtUtils::CChecker->VERSION( 0.04 ) } or
 
 my $cc = ExtUtils::CChecker->new();
 
-my $CAN_XS = 0;
-my $HAVE_SOCKADDR_SA_LEN;
+print "\nDetecting if libc supports getaddrinfo()...\n";
 
-TRY_XS: {
-   if( $ENV{NO_XS} ) {
-      print "\$ENV{NO_XS} is set - XS code will be disabled\n";
-      last TRY_XS;
-   }
-
-   print "\nDetecting if libc supports getaddrinfo()...\n";
-
-   last TRY_XS unless $cc->try_find_libs_for(
-      # Solaris et.al. use -lsocket or -lsocket -lnsl
-      libs => [ "", "socket", "socket nsl", "ws2_32" ],
-      source => <<'EOF' );
+$cc->try_find_libs_for(
+   define => "HAVE_GETADDRINFO",
+   # Solaris et.al. use -lsocket or -lsocket -lnsl
+   libs => [ "", "socket", "socket nsl", "ws2_32" ],
+   source => <<'EOF' );
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef _WIN32
@@ -59,15 +51,11 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   $CAN_XS = 1;
+print "Detecting if sockaddr has sa_len field...\n";
 
-   print "\nLooks like the libc supports getaddrinfo()\n";
-
-   print "Detecting if sockaddr has sa_len field...\n";
-
-   $cc->try_compile_run(
-      define => "HAVE_SOCKADDR_SA_LEN",
-      source => <<'EOF' );
+$cc->try_compile_run(
+   define => "HAVE_SOCKADDR_SA_LEN",
+   source => <<'EOF' );
 #include <stdlib.h>
 #ifdef _WIN32
 #include <winsock2.h>
@@ -83,7 +71,6 @@ int main(int argc, char *argv[]) {
    return 0;
 }
 EOF
-}
 
 my $build = $cc->new_module_build(
    module_name => 'Socket::GetAddrInfo',
@@ -100,14 +87,11 @@ my $build = $cc->new_module_build(
       'Module::Build::Compat' => 0,
       'Scalar::Util' => 0,
       'Test::More' => 0,
-      'Test::Exception' => 0,
-      'Test::Warn' => 0,
    },
    license => 'perl',
    create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
-   xs_files => $CAN_XS ? { ('lib/Socket/GetAddrInfo.xs') x 2 } : {},
 );
 
 $build->create_build_script;

@@ -8,6 +8,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifdef HAVE_GETADDRINFO
+
 #ifdef _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -22,7 +24,7 @@
 # define Newx(p,n,t) New(0,p,n,t)
 #endif
 
-SV *err_to_SV(int err)
+static SV *err_to_SV(int err)
 {
   SV *ret = sv_newmortal();
   SvUPGRADE(ret, SVt_PVNV);
@@ -110,18 +112,15 @@ static void setup_constants(void)
 #endif
 }
 
-MODULE = Socket::GetAddrInfo      PACKAGE = Socket::GetAddrInfo
+static void xs_getaddrinfo(pTHX_ CV *cv)
+{
+    dVAR;
+    dXSARGS;
 
-BOOT:
-  setup_constants();
+    SV   *host;
+    SV   *service;
+    SV   *hints;
 
-void
-getaddrinfo(host=&PL_sv_undef, service=&PL_sv_undef, hints=NULL)
-    SV   *host
-    SV   *service
-    SV   *hints
-
-  PREINIT:
     char *hostname = NULL;
     char *servicename = NULL;
     STRLEN len;
@@ -131,7 +130,26 @@ getaddrinfo(host=&PL_sv_undef, service=&PL_sv_undef, hints=NULL)
     int err;
     int n_res;
 
-  PPCODE:
+    if(items > 3)
+      croak_xs_usage(cv, "host, service, hints");
+
+    SP -= items;
+
+    if(items < 1)
+      host = &PL_sv_undef;
+    else
+      host = ST(0);
+
+    if(items < 2)
+      service = &PL_sv_undef;
+    else
+      service = ST(1);
+
+    if(items < 3)
+      hints = NULL;
+    else
+      hints = ST(2);
+
     SvGETMAGIC(host);
     if(SvOK(host)) {
       hostname = SvPV_nomg(host, len);
@@ -194,20 +212,34 @@ getaddrinfo(host=&PL_sv_undef, service=&PL_sv_undef, hints=NULL)
     freeaddrinfo(res);
 
     XSRETURN(1 + n_res);
+}
 
-void
-getnameinfo(addr, flags=0)
-    SV  *addr
-    int  flags
+static void xs_getnameinfo(pTHX_ CV *cv)
+{
+    dVAR;
+    dXSARGS;
 
-  PREINIT:
+    SV  *addr;
+    int  flags;
+
     char host[1024];
     char serv[256];
     char *sa; /* we'll cast to struct sockaddr * when necessary */
     STRLEN addr_len;
     int err;
 
-  PPCODE:
+    if(items < 1 || items > 2)
+      croak_xs_usage(cv, "addr, flags=0");
+
+    SP -= items;
+
+    addr = ST(0);
+
+    if(items < 2)
+      flags = 0;
+    else
+      flags = SvIV(ST(1));
+
     if(!SvPOK(addr))
       croak("addr is not a string");
 
@@ -237,3 +269,15 @@ getnameinfo(addr, flags=0)
     XPUSHs(sv_2mortal(newSVpv(serv, 0)));
 
     XSRETURN(3);
+}
+
+#endif
+
+MODULE = Socket::GetAddrInfo      PACKAGE = Socket::GetAddrInfo
+
+BOOT:
+#ifdef HAVE_GETADDRINFO
+  setup_constants();
+  newXS("Socket::GetAddrInfo::getaddrinfo", xs_getaddrinfo, __FILE__);
+  newXS("Socket::GetAddrInfo::getnameinfo", xs_getnameinfo, __FILE__);
+#endif

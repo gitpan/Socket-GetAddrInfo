@@ -1,5 +1,12 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_001 CHANGES:
+         * Always attempt to build XS code and load it at runtime, use
+           presence of &getaddrinfo to detect if native support exists or
+           whether to use legacy fallback
+         * Avoid Test::Exception and Test::Warn as they're non-core and pull
+           in Sub::UpLevel
+
 0.19    BUGFIXES:
          * Can't store &PL_sv_undef in an HV; store newSV(0) instead
          * Handle magic in getaddrinfo() args [chansen]
