@@ -10,6 +10,7 @@ build_requires:
   Scalar::Util: 0
   Test::More: 0
 configure_requires:
+  ExtUtils::CBuilder: 0
   ExtUtils::CChecker: 0.04
   Module::Build: 0.36
 generated_by: 'Module::Build version 0.3607'
@@ -21,9 +22,12 @@ name: Socket-GetAddrInfo
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.19_001
+    version: 0.19_002
+  Socket::GetAddrInfo::PP:
+    file: lib/Socket/GetAddrInfo/PP.pm
+    version: 0.19_002
 requires:
   XSLoader: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.19_001
+version: 0.19_002

@@ -7,7 +7,7 @@ use_ok( "Socket::GetAddrInfo", ':newapi' ); # Tag to avoid the deprecation warni
 
 # Declare which case is being used; can be useful in test reports
 
-if( \&Socket::GetAddrInfo::getaddrinfo == \&Socket::GetAddrInfo::fake_getaddrinfo ) {
+if( \&Socket::GetAddrInfo::getaddrinfo == \&Socket::GetAddrInfo::PP::getaddrinfo ) {
    diag "Using emulation using legacy resolvers";
 }
 else {

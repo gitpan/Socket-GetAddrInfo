@@ -194,16 +194,16 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
     for(res_iter = res; res_iter; res_iter = res_iter->ai_next) {
       HV *res_hv = newHV();
 
-      hv_store(res_hv, "family",   6, newSViv(res_iter->ai_family),   0);
-      hv_store(res_hv, "socktype", 8, newSViv(res_iter->ai_socktype), 0);
-      hv_store(res_hv, "protocol", 8, newSViv(res_iter->ai_protocol), 0);
+      hv_stores(res_hv, "family",   newSViv(res_iter->ai_family));
+      hv_stores(res_hv, "socktype", newSViv(res_iter->ai_socktype));
+      hv_stores(res_hv, "protocol", newSViv(res_iter->ai_protocol));
 
-      hv_store(res_hv, "addr",     4, newSVpvn((char*)res_iter->ai_addr, res_iter->ai_addrlen), 0);
+      hv_stores(res_hv, "addr",     newSVpvn((char*)res_iter->ai_addr, res_iter->ai_addrlen));
 
       if(res_iter->ai_canonname)
-        hv_store(res_hv, "canonname", 9, newSVpv(res_iter->ai_canonname, 0), 0);
+        hv_stores(res_hv, "canonname", newSVpv(res_iter->ai_canonname, 0));
       else
-        hv_store(res_hv, "canonname", 9, newSV(0), 0);
+        hv_stores(res_hv, "canonname", newSV(0));
 
       XPUSHs(sv_2mortal(newRV_noinc((SV*)res_hv)));
       n_res++;

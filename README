@@ -166,8 +166,11 @@ SOCKET6 COMPATIBILITY FUNCTIONS
     supplied.
 
 LIMITS OF EMULATION
-    These emulations are not a complete replacement of the real functions,
-    because they only support IPv4 (the "AF_INET" socket family).
+    If the real getaddrinfo(3) and getnameinfo(3) functions are not
+    available, they will be emulated using the legacy resolvers
+    "gethostbyname", etc... These emulations are not a complete replacement
+    of the real functions, because they only support IPv4 (the "AF_INET"
+    socket family). In this case, the following restrictions will apply.
 
   getaddrinfo
     *   If $family is supplied, it must be "AF_INET". Any other value will
