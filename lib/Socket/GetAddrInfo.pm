@@ -10,22 +10,20 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_002';
+our $VERSION = '0.19_003';
 
-our @EXPORT = qw(
-   getaddrinfo
-   getnameinfo
-);
+foreach my $impl (qw( XS PP )) {
+   my $class = "Socket::GetAddrInfo::$impl";
+   my $file  = "Socket/GetAddrInfo/$impl.pm";
+   eval {
+      require $file;
+      $class->import;
 
-require XSLoader;
-eval { XSLoader::load(__PACKAGE__, $VERSION ) };
+      no strict 'refs';
+      push our @EXPORT, @{"${class}::EXPORT"};
+   };
 
-if( !defined &getaddrinfo ) {
-   require Socket::GetAddrInfo::PP;
-   Socket::GetAddrInfo::PP->import;
-
-   no warnings 'once';
-   push @EXPORT, @Socket::GetAddrInfo::PP::EXPORT;
+   last if defined &getaddrinfo;
 }
 
 =head1 NAME
@@ -84,7 +82,8 @@ whether the underlying OS will support these functions. If it does not, the
 module will use emulations of the functions using the legacy resolver
 functions instead. The emulations support the same interface as the real
 functions, and behave as close as is resonably possible to emulate using the
-legacy resolvers. See below for details on the limits of this emulation.
+legacy resolvers. See L<Socket::GetAddrInfo::PP> for details on the limits of
+this emulation.
 
 =cut
 
@@ -93,22 +92,19 @@ sub import
    my $class = shift;
    my %symbols = map { $_ => 1 } @_;
 
-   my $api;
-   $api = "new"     if delete $symbols{':newapi'};
+   my $api = "new";
+   delete $symbols{':newapi'}; # legacy
    $api = "Socket6" if delete $symbols{':Socket6api'};
 
-   if( $symbols{getaddrinfo} or $symbols{getnameinfo} ) {
-      defined $api or carp <<EOF;
-Importing Socket::GetAddrInfo without ':newapi' or ':Socket6api' tag.
-Defaults to :Socket6api currently but default will change in a future version.
-EOF
-      if( !defined $api or $api eq "Socket6" ) {
-         my $callerpkg = caller;
+   if( $api eq "Socket6" and
+       $symbols{getaddrinfo} || $symbols{getnameinfo} ) {
 
-         no strict 'refs';
-         *{"${callerpkg}::getaddrinfo"} = \&Socket6_getaddrinfo if delete $symbols{getaddrinfo};
-         *{"${callerpkg}::getnameinfo"} = \&Socket6_getnameinfo if delete $symbols{getnameinfo};
-      }
+      my $callerpkg = caller;
+      require Socket::GetAddrInfo::Socket6api;
+
+      no strict 'refs';
+      *{"${callerpkg}::getaddrinfo"} = \&Socket::GetAddrInfo::Socket6api::getaddrinfo if delete $symbols{getaddrinfo};
+      *{"${callerpkg}::getnameinfo"} = \&Socket::GetAddrInfo::Socket6api::getnameinfo if delete $symbols{getnameinfo};
    }
 
    return unless keys %symbols;
@@ -120,26 +116,6 @@ EOF
 }
 
 =head1 FUNCTIONS
-
-The functions in this module are provided in one of two API styles, selectable
-at the time they are imported into the caller, by the use of the following
-tags:
-
- use Socket::GetAddrInfo qw( :newapi getaddrinfo );
-
- use Socket::GetAddrInfo qw( :Socket6api getaddrinfo );
-
-The choice is implemented by importing different functions into the caller,
-which means different importing packages may choose different API styles. It
-is recommended that new code import the C<:newapi> style to take advantage of
-neater argument / return results, and error reporting. The C<:Socket6api>
-style is provided as backward-compatibility for code that wants to use
-C<Socket6>.
-
-If neither style is selected, then this module will provide a Socket6-like API
-to be compatible with earlier versions of C<Socket::GetAddrInfo>. This
-behaviour will change in a later version of the module - make sure to always
-specify the required API type.
 
 =cut
 
@@ -228,106 +204,6 @@ Errors are indicated by the C<$err> value returned; which will be non-zero in
 numeric context, and contain a string error message as a string. The value can
 be compared against any of the C<EAI_*> constants to determine what the error
 is.
-
-=cut
-
-=head1 SOCKET6 COMPATIBILITY FUNCTIONS
-
-=head2 @res = getaddrinfo( $host, $service, $family, $socktype, $protocol, $flags )
-
-This version of the API takes the hints values as separate ordered parameters.
-Unspecified parameters should be passed as C<0>.
-
-If successful, this function returns a flat list of values, five for each
-returned address structure. Each group of five elements will contain, in
-order, the C<family>, C<socktype>, C<protocol>, C<addr> and C<canonname>
-values of the address structure.
-
-If unsuccessful, it will return a single value, containing the string error
-message. To remain compatible with the C<Socket6> interface, this value does
-not have the error integer part.
-
-=cut
-
-sub Socket6_getaddrinfo
-{
-   @_ >= 2 and @_ <= 6 or 
-      croak "Usage: getaddrinfo(host, service, family=0, socktype=0, protocol=0, flags=0)";
-
-   my ( $host, $service, $family, $socktype, $protocol, $flags ) = @_;
-
-   my ( $err, @res ) = getaddrinfo( $host, $service, {
-      flags    => $flags    || 0,
-      family   => $family   || 0,
-      socktype => $socktype || 0,
-      protocol => $protocol || 0,
-   } );
-
-   return "$err" if $err;
-   return map { $_->{family}, $_->{socktype}, $_->{protocol}, $_->{addr}, $_->{canonname} } @res;
-}
-
-=head2 ( $host, $service ) = getnameinfo( $addr, $flags )
-
-This version of the API returns only the host name and service name, if
-successfully resolved. On error, it will return an empty list. To remain
-compatible with the C<Socket6> interface, no error information will be
-supplied.
-
-=cut
-
-sub Socket6_getnameinfo
-{
-   @_ >= 1 and @_ <= 2 or
-      croak "Usage: getnameinfo(addr, flags=0)";
-
-   my ( $addr, $flags ) = @_;
-
-   my ( $err, $host, $service ) = getnameinfo( $addr, $flags );
-
-   return () if $err;
-   return ( $host, $service );
-}
-
-=head1 LIMITS OF EMULATION
-
-If the real C<getaddrinfo(3)> and C<getnameinfo(3)> functions are not
-available, they will be emulated using the legacy resolvers C<gethostbyname>,
-etc... These emulations are not a complete replacement of the real functions,
-because they only support IPv4 (the C<AF_INET> socket family). In this case,
-the following restrictions will apply.
-
-=head2 getaddrinfo
-
-=over 4
-
-=item *
-
-If C<$family> is supplied, it must be C<AF_INET>. Any other value will result
-in an error thrown by C<croak>.
-
-=item *
-
-The only supported C<$flags> values are C<AI_PASSIVE>, C<AI_CANONNAME>, and
-C<AI_NUMERICHOST>.
-
-=back
-
-=head2 getnameinfo
-
-=over 4
-
-=item *
-
-If the sockaddr family of C<$addr> is anything other than C<AF_INET>, an error
-will be thrown with C<croak>.
-
-=item *
-
-The only supported C<$flags> values are C<NI_NUMERICHOST>, C<NI_NUMERICSERV>,
-C<NI_NAMEREQD> and C<NI_DGRAM>.
-
-=back
 
 =cut
 

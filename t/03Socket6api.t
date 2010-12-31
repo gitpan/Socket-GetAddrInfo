@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 8;
 
-use Socket::GetAddrInfo qw( :Socket6api getaddrinfo getnameinfo NI_NUMERICHOST NI_NUMERICSERV );
+use Socket::GetAddrInfo::Socket6api qw( getaddrinfo getnameinfo NI_NUMERICHOST NI_NUMERICSERV );
 use Socket qw( AF_INET SOCK_STREAM IPPROTO_TCP pack_sockaddr_in unpack_sockaddr_in inet_aton );
 
 # Test::More's printing in is() isn't very helpful for addresses.

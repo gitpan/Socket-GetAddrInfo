@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 14;
 
-use Socket::GetAddrInfo qw( :newapi getnameinfo NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
+use Socket::GetAddrInfo qw( getnameinfo NI_NUMERICHOST NI_NUMERICSERV NI_NAMEREQD );
 
 use Socket qw( AF_INET pack_sockaddr_in inet_aton );
 

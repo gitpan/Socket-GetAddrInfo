@@ -53,30 +53,10 @@ DESCRIPTION
     the module will use emulations of the functions using the legacy
     resolver functions instead. The emulations support the same interface as
     the real functions, and behave as close as is resonably possible to
-    emulate using the legacy resolvers. See below for details on the limits
-    of this emulation.
+    emulate using the legacy resolvers. See Socket::GetAddrInfo::PP for
+    details on the limits of this emulation.
 
 FUNCTIONS
-    The functions in this module are provided in one of two API styles,
-    selectable at the time they are imported into the caller, by the use of
-    the following tags:
-
-     use Socket::GetAddrInfo qw( :newapi getaddrinfo );
-
-     use Socket::GetAddrInfo qw( :Socket6api getaddrinfo );
-
-    The choice is implemented by importing different functions into the
-    caller, which means different importing packages may choose different
-    API styles. It is recommended that new code import the ":newapi" style
-    to take advantage of neater argument / return results, and error
-    reporting. The ":Socket6api" style is provided as backward-compatibility
-    for code that wants to use "Socket6".
-
-    If neither style is selected, then this module will provide a
-    Socket6-like API to be compatible with earlier versions of
-    "Socket::GetAddrInfo". This behaviour will change in a later version of
-    the module - make sure to always specify the required API type.
-
   ( $err, @res ) = getaddrinfo( $host, $service, $hints )
     When given both host and service, this function attempts to resolve the
     host name to a set of network addresses, and the service name into a
@@ -144,47 +124,6 @@ FUNCTIONS
     in numeric context, and contain a string error message as a string. The
     value can be compared against any of the "EAI_*" constants to determine
     what the error is.
-
-SOCKET6 COMPATIBILITY FUNCTIONS
-  @res = getaddrinfo( $host, $service, $family, $socktype, $protocol, $flags )
-    This version of the API takes the hints values as separate ordered
-    parameters. Unspecified parameters should be passed as 0.
-
-    If successful, this function returns a flat list of values, five for
-    each returned address structure. Each group of five elements will
-    contain, in order, the "family", "socktype", "protocol", "addr" and
-    "canonname" values of the address structure.
-
-    If unsuccessful, it will return a single value, containing the string
-    error message. To remain compatible with the "Socket6" interface, this
-    value does not have the error integer part.
-
-  ( $host, $service ) = getnameinfo( $addr, $flags )
-    This version of the API returns only the host name and service name, if
-    successfully resolved. On error, it will return an empty list. To remain
-    compatible with the "Socket6" interface, no error information will be
-    supplied.
-
-LIMITS OF EMULATION
-    If the real getaddrinfo(3) and getnameinfo(3) functions are not
-    available, they will be emulated using the legacy resolvers
-    "gethostbyname", etc... These emulations are not a complete replacement
-    of the real functions, because they only support IPv4 (the "AF_INET"
-    socket family). In this case, the following restrictions will apply.
-
-  getaddrinfo
-    *   If $family is supplied, it must be "AF_INET". Any other value will
-        result in an error thrown by "croak".
-
-    *   The only supported $flags values are "AI_PASSIVE", "AI_CANONNAME",
-        and "AI_NUMERICHOST".
-
-  getnameinfo
-    *   If the sockaddr family of $addr is anything other than "AF_INET", an
-        error will be thrown with "croak".
-
-    *   The only supported $flags values are "NI_NUMERICHOST",
-        "NI_NUMERICSERV", "NI_NAMEREQD" and "NI_DGRAM".
 
 BUGS
     *   At the time of writing, there are no test reports from the "MSWin32"

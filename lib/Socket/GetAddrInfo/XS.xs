@@ -7,6 +7,10 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_newCONSTSUB
+#define NEED_newRV_noinc
+#define NEED_sv_2pv_flags
+#include "../../../ppport.h"
 
 #ifdef HAVE_GETADDRINFO
 
@@ -17,11 +21,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#endif
-
-// Newx was new in 5.9.3
-#ifndef Newx
-# define Newx(p,n,t) New(0,p,n,t)
 #endif
 
 static SV *err_to_SV(int err)
@@ -47,8 +46,8 @@ static void setup_constants(void)
   HV *stash;
   AV *export;
 
-  stash = gv_stashpvn("Socket::GetAddrInfo", 19, TRUE);
-  export = get_av("Socket::GetAddrInfo::EXPORT", TRUE);
+  stash = gv_stashpvn("Socket::GetAddrInfo::XS", 23, TRUE);
+  export = get_av("Socket::GetAddrInfo::XS::EXPORT", TRUE);
 
 #define DO_CONSTANT(c) \
   newCONSTSUB(stash, #c, newSViv(c)); \
@@ -273,11 +272,11 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 
 #endif
 
-MODULE = Socket::GetAddrInfo      PACKAGE = Socket::GetAddrInfo
+MODULE = Socket::GetAddrInfo::XS  PACKAGE = Socket::GetAddrInfo::XS
 
 BOOT:
 #ifdef HAVE_GETADDRINFO
   setup_constants();
-  newXS("Socket::GetAddrInfo::getaddrinfo", xs_getaddrinfo, __FILE__);
-  newXS("Socket::GetAddrInfo::getnameinfo", xs_getnameinfo, __FILE__);
+  newXS("Socket::GetAddrInfo::XS::getaddrinfo", xs_getaddrinfo, __FILE__);
+  newXS("Socket::GetAddrInfo::XS::getnameinfo", xs_getnameinfo, __FILE__);
 #endif

@@ -22,12 +22,18 @@ name: Socket-GetAddrInfo
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.19_002
+    version: 0.19_003
   Socket::GetAddrInfo::PP:
     file: lib/Socket/GetAddrInfo/PP.pm
-    version: 0.19_002
+    version: 0.19_003
+  Socket::GetAddrInfo::Socket6api:
+    file: lib/Socket/GetAddrInfo/Socket6api.pm
+    version: 0.19_003
+  Socket::GetAddrInfo::XS:
+    file: lib/Socket/GetAddrInfo/XS.pm
+    version: 0.19_003
 requires:
   XSLoader: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.19_002
+version: 0.19_003

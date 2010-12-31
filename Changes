@@ -1,5 +1,12 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_003 CHANGES:
+         * Split Socket6api into its own module
+         * Moved XS code to Socket::GetAddrInfo::XS
+         * Use ppport.h
+         * Emulate AI_NUMERICSERV in PP emulation since most OSes in practice
+           support it, even though RFC 2553 doesn't define it
+
 0.19_002 CHANGES:
          * Don't even attempt to build XS code if no C compiler is available
          * Moved legacy resolver emulation code into its own PP.pm for code

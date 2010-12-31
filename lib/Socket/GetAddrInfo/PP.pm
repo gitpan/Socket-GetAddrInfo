@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::PP;
 use strict;
 use warnings;
 
-our $VERSION = '0.19_002';
+our $VERSION = '0.19_003';
 
 use Carp;
 
@@ -18,6 +18,24 @@ use Scalar::Util qw( dualvar );
 use Exporter 'import';
 our @EXPORT;
 
+=head1 NAME
+
+C<Socket::GetAddrInfo::PP> - Pure Perl emulation of C<getaddrinfo> and
+C<getnameinfo> using IPv4-only legacy resolvers
+
+=head1 DESCRIPTION
+
+C<Socket::GetAddrInfo> attempts to provide the C<getaddrinfo> and
+C<getnameinfo> functions as specified by RFC 2553. Ideally this is done by
+some XS code that calls the real functions in F<libc>. If for some reason this
+cannot be done; either there is no C compiler, or F<libc> does not provide
+these functions, then they will be emulated using the legacy resolvers
+C<gethostbyname>, etc... These emulations are not a complete replacement of
+the real functions, because they only support IPv4 (the C<AF_INET> socket
+family). In this case, the following restrictions will apply.
+
+=cut
+
 # These numbers borrowed from GNU libc's implementation, but since
 # they're only used by our emulation, it doesn't matter if the real
 # platform's values differ
@@ -26,6 +44,9 @@ BEGIN {
        AI_PASSIVE     => 1,
        AI_CANONNAME   => 2,
        AI_NUMERICHOST => 4,
+       # RFC 2553 doesn't define this but Linux does - lets be nice and
+       # provide it since we can
+       AI_NUMERICSERV => 1024,
 
        EAI_BADFLAGS   => -1,
        EAI_NONAME     => -2,
@@ -69,6 +90,28 @@ sub _makeerr
    return dualvar( $errno, $errstr );
 }
 
+=head2 getaddrinfo
+
+=over 4
+
+=item *
+
+If the C<family> hint is supplied, it must be C<AF_INET>. Any other value will
+result in an error thrown by C<croak>.
+
+=item *
+
+The only supported C<flags> hint values are C<AI_PASSIVE>, C<AI_CANONNAME>,
+C<AI_NUMERICSERV> and C<AI_NUMERICHOST>.
+
+Note that C<AI_NUMERICSERV> is an extension not defined by RFC 2553, but is
+provided by most OSes. It is possible (though unlikely) that even the native
+XS implementation does not recognise this constant.
+
+=back
+
+=cut
+
 sub getaddrinfo
 {
    my ( $node, $service, $hints ) = @_;
@@ -80,7 +123,7 @@ sub getaddrinfo
    my ( $family, $socktype, $protocol, $flags ) = @$hints{qw( family socktype protocol flags )};
 
    $family ||= AF_INET; # 0 == AF_UNSPEC, which we want too
-   $family == AF_INET() or return _makeerr( EAI_FAMILY );
+   $family == AF_INET or return _makeerr( EAI_FAMILY );
 
    $socktype ||= 0;
 
@@ -88,9 +131,10 @@ sub getaddrinfo
 
    $flags ||= 0;
 
-   my $flag_passive     = $flags & AI_PASSIVE();     $flags &= ~AI_PASSIVE();
-   my $flag_canonname   = $flags & AI_CANONNAME();   $flags &= ~AI_CANONNAME();
-   my $flag_numerichost = $flags & AI_NUMERICHOST(); $flags &= ~AI_NUMERICHOST();
+   my $flag_passive     = $flags & AI_PASSIVE;     $flags &= ~AI_PASSIVE;
+   my $flag_canonname   = $flags & AI_CANONNAME;   $flags &= ~AI_CANONNAME;
+   my $flag_numerichost = $flags & AI_NUMERICHOST; $flags &= ~AI_NUMERICHOST;
+   my $flag_numericserv = $flags & AI_NUMERICSERV; $flags &= ~AI_NUMERICSERV;
 
    $flags == 0 or return _makeerr( EAI_BADFLAGS );
 
@@ -117,6 +161,7 @@ sub getaddrinfo
    }
 
    if( $service ne "" and $service !~ m/^\d+$/ ) {
+      return _makeerr( EAI_NONAME ) if( $flag_numericserv );
       getservbyname( $service, $protname ) or return _makeerr( EAI_SERVICE );
    }
 
@@ -163,6 +208,24 @@ sub getaddrinfo
    return ( _makeerr( 0 ), @ret );
 }
 
+=head2 getnameinfo
+
+=over 4
+
+=item *
+
+If the sockaddr family of C<$addr> is anything other than C<AF_INET>, an error
+will be thrown with C<croak>.
+
+=item *
+
+The only supported C<$flags> values are C<NI_NUMERICHOST>, C<NI_NUMERICSERV>,
+C<NI_NAMEREQD> and C<NI_DGRAM>.
+
+=back
+
+=cut
+
 sub getnameinfo
 {
    my ( $addr, $flags ) = @_;
@@ -175,10 +238,10 @@ sub getnameinfo
 
    $flags ||= 0;
 
-   my $flag_numerichost = $flags & NI_NUMERICHOST(); $flags &= ~NI_NUMERICHOST();
-   my $flag_numericserv = $flags & NI_NUMERICSERV(); $flags &= ~NI_NUMERICSERV();
-   my $flag_namereqd    = $flags & NI_NAMEREQD();    $flags &= ~NI_NAMEREQD();
-   my $flag_dgram       = $flags & NI_DGRAM()   ;    $flags &= ~NI_DGRAM();
+   my $flag_numerichost = $flags & NI_NUMERICHOST; $flags &= ~NI_NUMERICHOST;
+   my $flag_numericserv = $flags & NI_NUMERICSERV; $flags &= ~NI_NUMERICSERV;
+   my $flag_namereqd    = $flags & NI_NAMEREQD;    $flags &= ~NI_NAMEREQD;
+   my $flag_dgram       = $flags & NI_DGRAM;       $flags &= ~NI_DGRAM;
 
    $flags == 0 or return _makeerr( EAI_BADFLAGS );
 
@@ -211,3 +274,9 @@ sub getnameinfo
 
 # Keep perl happy; keep Britain tidy
 1;
+
+__END__
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

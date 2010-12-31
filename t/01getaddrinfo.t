@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 39;
 
-use Socket::GetAddrInfo qw( :newapi getaddrinfo AI_NUMERICHOST );
+use Socket::GetAddrInfo qw( getaddrinfo AI_NUMERICHOST );
 
 use Socket qw( AF_INET SOCK_STREAM IPPROTO_TCP unpack_sockaddr_in inet_aton );
 

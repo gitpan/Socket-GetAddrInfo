@@ -1,9 +1,10 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 1;
+use Test::More tests => 2;
 
-use_ok( "Socket::GetAddrInfo", ':newapi' ); # Tag to avoid the deprecation warning
+use_ok( "Socket::GetAddrInfo" );
+use_ok( "Socket::GetAddrInfo::Socket6api" );
 
 # Declare which case is being used; can be useful in test reports
 
