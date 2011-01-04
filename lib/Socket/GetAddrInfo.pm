@@ -10,7 +10,10 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_003';
+our $VERSION = '0.19_004';
+
+our @EXPORT;
+our %EXPORT_TAGS;
 
 foreach my $impl (qw( XS PP )) {
    my $class = "Socket::GetAddrInfo::$impl";
@@ -19,8 +22,9 @@ foreach my $impl (qw( XS PP )) {
       require $file;
       $class->import;
 
-      no strict 'refs';
-      push our @EXPORT, @{"${class}::EXPORT"};
+      my $impl_EXPORT = do { no strict 'refs'; \@{"${class}::EXPORT"} };
+
+      push @EXPORT, @$impl_EXPORT;
    };
 
    last if defined &getaddrinfo;
@@ -86,6 +90,38 @@ legacy resolvers. See L<Socket::GetAddrInfo::PP> for details on the limits of
 this emulation.
 
 =cut
+
+=head1 EXPORT TAGS
+
+The following tags may be imported by C<use Socket::GetAddrInfo qw( :tag )>:
+
+=over 8
+
+=item AI
+
+Imports all of the C<AI_*> constants for C<getaddrinfo> flags
+
+=item NI
+
+Imports all of the C<NI_*> constants for C<getnameinfo> flags
+
+=item EAI
+
+Imports all of the C<EAI_*> for error values
+
+=item constants
+
+Imports all of the above constants
+
+=back
+
+=cut
+
+$EXPORT_TAGS{AI}  = [ grep m/^AI_/,  @EXPORT ];
+$EXPORT_TAGS{NI}  = [ grep m/^NI_/,  @EXPORT ];
+$EXPORT_TAGS{EAI} = [ grep m/^EAI_/, @EXPORT ];
+
+$EXPORT_TAGS{constants} = [ map @{$EXPORT_TAGS{$_}}, qw( AI NI EAI ) ];
 
 sub import
 {

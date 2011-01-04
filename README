@@ -56,6 +56,19 @@ DESCRIPTION
     emulate using the legacy resolvers. See Socket::GetAddrInfo::PP for
     details on the limits of this emulation.
 
+EXPORT TAGS
+    The following tags may be imported by "use Socket::GetAddrInfo qw( :tag
+    )":
+
+    AI      Imports all of the "AI_*" constants for "getaddrinfo" flags
+
+    NI      Imports all of the "NI_*" constants for "getnameinfo" flags
+
+    EAI     Imports all of the "EAI_*" for error values
+
+    constants
+            Imports all of the above constants
+
 FUNCTIONS
   ( $err, @res ) = getaddrinfo( $host, $service, $hints )
     When given both host and service, this function attempts to resolve the

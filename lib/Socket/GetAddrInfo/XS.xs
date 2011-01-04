@@ -12,7 +12,7 @@
 #define NEED_sv_2pv_flags
 #include "../../../ppport.h"
 
-#ifdef HAVE_GETADDRINFO
+#ifdef HAS_GETADDRINFO
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -23,7 +23,7 @@
 #include <netdb.h>
 #endif
 
-static SV *err_to_SV(int err)
+static SV *err_to_SV(pTHX_ int err)
 {
   SV *ret = sv_newmortal();
   SvUPGRADE(ret, SVt_PVNV);
@@ -123,7 +123,7 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
     char *hostname = NULL;
     char *servicename = NULL;
     STRLEN len;
-    struct addrinfo hints_s = { 0 };
+    struct addrinfo hints_s;
     struct addrinfo *res;
     struct addrinfo *res_iter;
     int err;
@@ -163,6 +163,8 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
         servicename = NULL;
     }
 
+    Zero(&hints_s, sizeof hints_s, char);
+
     if(hints && SvOK(hints)) {
       HV *hintshash;
       SV **valp;
@@ -184,7 +186,7 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
 
     err = getaddrinfo(hostname, servicename, &hints_s, &res);
 
-    XPUSHs(err_to_SV(err));
+    XPUSHs(err_to_SV(aTHX_ err));
 
     if(err)
       XSRETURN(1);
@@ -193,16 +195,16 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
     for(res_iter = res; res_iter; res_iter = res_iter->ai_next) {
       HV *res_hv = newHV();
 
-      hv_stores(res_hv, "family",   newSViv(res_iter->ai_family));
-      hv_stores(res_hv, "socktype", newSViv(res_iter->ai_socktype));
-      hv_stores(res_hv, "protocol", newSViv(res_iter->ai_protocol));
+      (void)hv_stores(res_hv, "family",   newSViv(res_iter->ai_family));
+      (void)hv_stores(res_hv, "socktype", newSViv(res_iter->ai_socktype));
+      (void)hv_stores(res_hv, "protocol", newSViv(res_iter->ai_protocol));
 
-      hv_stores(res_hv, "addr",     newSVpvn((char*)res_iter->ai_addr, res_iter->ai_addrlen));
+      (void)hv_stores(res_hv, "addr",     newSVpvn((char*)res_iter->ai_addr, res_iter->ai_addrlen));
 
       if(res_iter->ai_canonname)
-        hv_stores(res_hv, "canonname", newSVpv(res_iter->ai_canonname, 0));
+        (void)hv_stores(res_hv, "canonname", newSVpv(res_iter->ai_canonname, 0));
       else
-        hv_stores(res_hv, "canonname", newSV(0));
+        (void)hv_stores(res_hv, "canonname", newSV(0));
 
       XPUSHs(sv_2mortal(newRV_noinc((SV*)res_hv)));
       n_res++;
@@ -248,7 +250,7 @@ static void xs_getnameinfo(pTHX_ CV *cv)
      * not be due to SvOOK */
     Newx(sa, addr_len, char);
     Copy(SvPV_nolen(addr), sa, addr_len, char);
-#ifdef HAVE_SOCKADDR_SA_LEN
+#ifdef HAS_SOCKADDR_SA_LEN
     ((struct sockaddr *)sa)->sa_len = addr_len;
 #endif
 
@@ -259,7 +261,7 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 
     Safefree(sa);
 
-    XPUSHs(err_to_SV(err));
+    XPUSHs(err_to_SV(aTHX_ err));
 
     if(err)
       XSRETURN(1);
@@ -275,7 +277,7 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 MODULE = Socket::GetAddrInfo::XS  PACKAGE = Socket::GetAddrInfo::XS
 
 BOOT:
-#ifdef HAVE_GETADDRINFO
+#ifdef HAS_GETADDRINFO
   setup_constants();
   newXS("Socket::GetAddrInfo::XS::getaddrinfo", xs_getaddrinfo, __FILE__);
   newXS("Socket::GetAddrInfo::XS::getnameinfo", xs_getnameinfo, __FILE__);

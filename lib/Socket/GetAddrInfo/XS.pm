@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.19_003';
+our $VERSION = '0.19_004';
 
 use Exporter 'import';
 our @EXPORT = qw(

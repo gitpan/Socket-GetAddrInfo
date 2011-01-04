@@ -19,7 +19,7 @@ if( ExtUtils::CBuilder->new->have_compiler ) {
    print "\nDetecting if libc supports getaddrinfo()...\n";
 
    $cc->try_find_libs_for(
-      define => "HAVE_GETADDRINFO",
+      define => "HAS_GETADDRINFO",
       # Solaris et.al. use -lsocket or -lsocket -lnsl
       libs => [ "", "socket", "socket nsl", "ws2_32" ],
       source => <<'EOF' );
@@ -60,7 +60,7 @@ EOF
    print "Detecting if sockaddr has sa_len field...\n";
 
    $cc->try_compile_run(
-      define => "HAVE_SOCKADDR_SA_LEN",
+      define => "HAS_SOCKADDR_SA_LEN",
       source => <<'EOF' );
 #include <stdlib.h>
 #ifdef _WIN32
