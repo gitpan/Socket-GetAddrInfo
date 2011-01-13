@@ -8,7 +8,7 @@ use_ok( "Socket::GetAddrInfo::Socket6api" );
 
 # Declare which case is being used; can be useful in test reports
 
-if( \&Socket::GetAddrInfo::getaddrinfo == \&Socket::GetAddrInfo::PP::getaddrinfo ) {
+if( defined $Socket::GetAddrInfo::PP::VERSION ) {
    diag "Using emulation using legacy resolvers";
 }
 else {

@@ -50,11 +50,11 @@ DESCRIPTION
 
     This module attempts to solve this problem, by detecting at compiletime
     whether the underlying OS will support these functions. If it does not,
-    the module will use emulations of the functions using the legacy
-    resolver functions instead. The emulations support the same interface as
-    the real functions, and behave as close as is resonably possible to
-    emulate using the legacy resolvers. See Socket::GetAddrInfo::PP for
-    details on the limits of this emulation.
+    the module will use pure-perl emulations of the functions using the
+    legacy resolver functions instead. The emulations support the same
+    interface as the real functions, and behave as close as is resonably
+    possible to emulate using the legacy resolvers. See
+    Socket::GetAddrInfo::PP for details on the limits of this emulation.
 
 EXPORT TAGS
     The following tags may be imported by "use Socket::GetAddrInfo qw( :tag
@@ -154,6 +154,9 @@ ACKNOWLEDGEMENTS
 
     Zefram <zefram@fysh.org> - for help with fixing some bugs in the XS
     code.
+
+    Reini Urban <rurban@cpan.org> - for help with older perls and more Win32
+    build fixes.
 
 AUTHOR
     Paul Evans <leonerd@leonerd.org.uk>

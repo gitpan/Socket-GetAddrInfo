@@ -1,5 +1,12 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_005 CHANGES:
+         * More MSWin32 fixes
+         * Older perls don't have croak_xs_usage; just use croak instead
+         * Moved XS code back to primary basename
+         * Use ExtUtils::CChecker 0.06's ability to write a config.h rather
+           than using C commandline -DFOO that might not be portable
+
 0.19_004 CHANGES:
          * Provide Exporter tags for named constants
          * Bugfix for non-C99 compilers - avoid C99-style struct initialiser

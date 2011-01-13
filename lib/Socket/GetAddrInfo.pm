@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2011 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo;
 
@@ -10,8 +10,9 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_004';
+our $VERSION = '0.19_005';
 
+require Exporter;
 our @EXPORT;
 our %EXPORT_TAGS;
 
@@ -19,12 +20,9 @@ foreach my $impl (qw( XS PP )) {
    my $class = "Socket::GetAddrInfo::$impl";
    my $file  = "Socket/GetAddrInfo/$impl.pm";
    eval {
+      # Each of the impls puts its symbols directly in our package
+      # Don't need to ->import
       require $file;
-      $class->import;
-
-      my $impl_EXPORT = do { no strict 'refs'; \@{"${class}::EXPORT"} };
-
-      push @EXPORT, @$impl_EXPORT;
    };
 
    last if defined &getaddrinfo;
@@ -83,11 +81,11 @@ C<gethostbyname()>, which means the code becomes more portable.
 
 This module attempts to solve this problem, by detecting at compiletime
 whether the underlying OS will support these functions. If it does not, the
-module will use emulations of the functions using the legacy resolver
-functions instead. The emulations support the same interface as the real
-functions, and behave as close as is resonably possible to emulate using the
-legacy resolvers. See L<Socket::GetAddrInfo::PP> for details on the limits of
-this emulation.
+module will use pure-perl emulations of the functions using the legacy
+resolver functions instead. The emulations support the same interface as the
+real functions, and behave as close as is resonably possible to emulate using
+the legacy resolvers. See L<Socket::GetAddrInfo::PP> for details on the limits
+of this emulation.
 
 =cut
 
@@ -144,8 +142,6 @@ sub import
    }
 
    return unless keys %symbols;
-
-   require Exporter;
 
    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
    Exporter::import( $class, keys %symbols );
@@ -278,6 +274,9 @@ Christian Hansen <chansen@cpan.org> - for help with some XS features and Win32
 build fixes.
 
 Zefram <zefram@fysh.org> - for help with fixing some bugs in the XS code.
+
+Reini Urban <rurban@cpan.org> - for help with older perls and more Win32
+build fixes.
 
 =head1 AUTHOR
 

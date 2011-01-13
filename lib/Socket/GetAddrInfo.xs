@@ -1,8 +1,43 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2008-2010 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2008-2011 -- leonerd@leonerd.org.uk
  */
+
+#include "config.h"
+
+#ifdef HAS_GETADDRINFO
+
+#include <stdlib.h>
+#include <stdio.h>
+#ifdef WIN32
+#undef WINVER
+#define WINVER          0x0501
+#ifdef __GNUC__
+# define USE_W32_SOCKETS
+#endif
+#include <winsock2.h>
+/* We need to include ws2tcpip.h to get the IPv6 definitions.
+ * It will in turn include wspiapi.h.  Later versions of that
+ * header in the Windows SDK generate C++ template code that
+ * can't be compiled with VC6 anymore.  The _WSPIAPI_COUNTOF
+ * definition below prevents wspiapi.h from generating this
+ * incompatible code.
+ */
+# define _WSPIAPI_COUNTOF(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+# undef UNICODE
+#include <ws2tcpip.h>
+#ifndef NI_NUMERICSERV
+#error Microsoft Platform SDK (Aug. 2001) or later required.
+#endif
+#ifdef _MSC_VER
+# pragma comment(lib, "Ws2_32.lib")
+#endif
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#endif
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -10,18 +45,7 @@
 #define NEED_newCONSTSUB
 #define NEED_newRV_noinc
 #define NEED_sv_2pv_flags
-#include "../../../ppport.h"
-
-#ifdef HAS_GETADDRINFO
-
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#endif
+#include "../../ppport.h"
 
 static SV *err_to_SV(pTHX_ int err)
 {
@@ -46,8 +70,8 @@ static void setup_constants(void)
   HV *stash;
   AV *export;
 
-  stash = gv_stashpvn("Socket::GetAddrInfo::XS", 23, TRUE);
-  export = get_av("Socket::GetAddrInfo::XS::EXPORT", TRUE);
+  stash = gv_stashpvn("Socket::GetAddrInfo", 19, TRUE);
+  export = get_av("Socket::GetAddrInfo::EXPORT", TRUE);
 
 #define DO_CONSTANT(c) \
   newCONSTSUB(stash, #c, newSViv(c)); \
@@ -130,7 +154,7 @@ static void xs_getaddrinfo(pTHX_ CV *cv)
     int n_res;
 
     if(items > 3)
-      croak_xs_usage(cv, "host, service, hints");
+      croak("Usage: Socket::GetAddrInfo(host, service, hints)");
 
     SP -= items;
 
@@ -230,7 +254,7 @@ static void xs_getnameinfo(pTHX_ CV *cv)
     int err;
 
     if(items < 1 || items > 2)
-      croak_xs_usage(cv, "addr, flags=0");
+      croak("Usage: Socket::GetAddrInfo(addr, flags=0)");
 
     SP -= items;
 
@@ -274,11 +298,11 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 
 #endif
 
-MODULE = Socket::GetAddrInfo::XS  PACKAGE = Socket::GetAddrInfo::XS
+MODULE = Socket::GetAddrInfo  PACKAGE = Socket::GetAddrInfo
 
 BOOT:
 #ifdef HAS_GETADDRINFO
   setup_constants();
-  newXS("Socket::GetAddrInfo::XS::getaddrinfo", xs_getaddrinfo, __FILE__);
-  newXS("Socket::GetAddrInfo::XS::getnameinfo", xs_getnameinfo, __FILE__);
+  newXS("Socket::GetAddrInfo::getaddrinfo", xs_getaddrinfo, __FILE__);
+  newXS("Socket::GetAddrInfo::getnameinfo", xs_getnameinfo, __FILE__);
 #endif

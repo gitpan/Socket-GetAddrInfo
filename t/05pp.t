@@ -4,7 +4,8 @@ use strict;
 
 use Test::More tests => 23;
 
-use Socket::GetAddrInfo::PP qw(
+BEGIN { $Socket::GetAddrInfo::NO_XS = 1; }
+use Socket::GetAddrInfo qw(
    getaddrinfo getnameinfo 
    AI_NUMERICHOST
    NI_NUMERICHOST NI_NUMERICSERV

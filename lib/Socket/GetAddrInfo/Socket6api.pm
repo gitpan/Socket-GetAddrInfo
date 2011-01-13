@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_004';
+our $VERSION = '0.19_005';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -37,7 +37,7 @@ using L<Socket6> API
 
  my $sock;
 
- my @res = getaddrinfo( "www.google.com", "www", AF_UNSPEC, SOCK_STREAM;
+ my @res = getaddrinfo( "www.google.com", "www", AF_UNSPEC, SOCK_STREAM );
 
  die "Cannot resolve name - $res[0]" if @res == 1;
 

@@ -4,14 +4,14 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   ExtUtils::CBuilder: 0
-  ExtUtils::CChecker: 0.04
+  ExtUtils::CChecker: 0.06
   Module::Build: 0
   Module::Build::Compat: 0
   Scalar::Util: 0
   Test::More: 0
 configure_requires:
   ExtUtils::CBuilder: 0
-  ExtUtils::CChecker: 0.04
+  ExtUtils::CChecker: 0.06
   Module::Build: 0.36
 generated_by: 'Module::Build version 0.3607'
 license: perl
@@ -22,18 +22,18 @@ name: Socket-GetAddrInfo
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.19_004
+    version: 0.19_005
   Socket::GetAddrInfo::PP:
     file: lib/Socket/GetAddrInfo/PP.pm
-    version: 0.19_004
+    version: 0.19_005
   Socket::GetAddrInfo::Socket6api:
     file: lib/Socket/GetAddrInfo/Socket6api.pm
-    version: 0.19_004
+    version: 0.19_005
   Socket::GetAddrInfo::XS:
     file: lib/Socket/GetAddrInfo/XS.pm
-    version: 0.19_004
+    version: 0.19_005
 requires:
   XSLoader: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.19_004
+version: 0.19_005
