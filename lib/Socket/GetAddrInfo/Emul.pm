@@ -3,12 +3,12 @@
 #
 #  (C) Paul Evans, 2007-2011 -- leonerd@leonerd.org.uk
 
-package Socket::GetAddrInfo::PP;
+package Socket::GetAddrInfo::Emul;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.19_005';
+our $VERSION = '0.19_006';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -23,7 +23,7 @@ our @EXPORT;
 
 =head1 NAME
 
-C<Socket::GetAddrInfo::PP> - Pure Perl emulation of C<getaddrinfo> and
+C<Socket::GetAddrInfo::Emul> - Pure Perl emulation of C<getaddrinfo> and
 C<getnameinfo> using IPv4-only legacy resolvers
 
 =head1 DESCRIPTION

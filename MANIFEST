@@ -3,7 +3,8 @@ Changes
 examples/gai.pl
 lib/Socket/GetAddrInfo.pm
 lib/Socket/GetAddrInfo.xs
-lib/Socket/GetAddrInfo/PP.pm
+lib/Socket/GetAddrInfo/Core.pm
+lib/Socket/GetAddrInfo/Emul.pm
 lib/Socket/GetAddrInfo/Socket6api.pm
 lib/Socket/GetAddrInfo/XS.pm
 LICENSE
@@ -17,5 +18,5 @@ t/01getaddrinfo.t
 t/02getnameinfo.t
 t/03Socket6api.t
 t/04import-tag.t
-t/05pp.t
+t/05emulation.t
 t/99pod.t

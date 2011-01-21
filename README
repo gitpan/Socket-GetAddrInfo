@@ -54,7 +54,13 @@ DESCRIPTION
     legacy resolver functions instead. The emulations support the same
     interface as the real functions, and behave as close as is resonably
     possible to emulate using the legacy resolvers. See
-    Socket::GetAddrInfo::PP for details on the limits of this emulation.
+    Socket::GetAddrInfo::Emul for details on the limits of this emulation.
+
+    As of "Socket" version 1.93 (as shipped by Perl version 5.13.9, and
+    hopefully will be in 5.14), core Perl already supports "getaddrinfo". On
+    such a system, this module simply uses the functions provided by
+    "Socket", and does not need to use its own compiled XS, or pure-perl
+    legacy emulation.
 
 EXPORT TAGS
     The following tags may be imported by "use Socket::GetAddrInfo qw( :tag

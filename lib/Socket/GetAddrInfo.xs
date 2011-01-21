@@ -6,17 +6,26 @@
 
 #include "config.h"
 
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#define NEED_newCONSTSUB
+#define NEED_newRV_noinc
+#define NEED_sv_2pv_flags
+#include "../../ppport.h"
+
 #ifdef HAS_GETADDRINFO
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #ifdef WIN32
-#undef WINVER
-#define WINVER          0x0501
-#ifdef __GNUC__
-# define USE_W32_SOCKETS
-#endif
-#include <winsock2.h>
+# undef WINVER
+# define WINVER          0x0501
+# ifdef __GNUC__
+#  define USE_W32_SOCKETS
+# endif
+# include <winsock2.h>
 /* We need to include ws2tcpip.h to get the IPv6 definitions.
  * It will in turn include wspiapi.h.  Later versions of that
  * header in the Windows SDK generate C++ template code that
@@ -26,26 +35,18 @@
  */
 # define _WSPIAPI_COUNTOF(_Array) (sizeof(_Array) / sizeof(_Array[0]))
 # undef UNICODE
-#include <ws2tcpip.h>
-#ifndef NI_NUMERICSERV
-#error Microsoft Platform SDK (Aug. 2001) or later required.
-#endif
-#ifdef _MSC_VER
-# pragma comment(lib, "Ws2_32.lib")
-#endif
+# include <ws2tcpip.h>
+# ifndef NI_NUMERICSERV
+#  error Microsoft Platform SDK (Aug. 2001) or later required.
+# endif
+# ifdef _MSC_VER
+#  pragma comment(lib, "Ws2_32.lib")
+# endif
 #else
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netdb.h>
 #endif
-
-#include "EXTERN.h"
-#include "perl.h"
-#include "XSUB.h"
-#define NEED_newCONSTSUB
-#define NEED_newRV_noinc
-#define NEED_sv_2pv_flags
-#include "../../ppport.h"
 
 static SV *err_to_SV(pTHX_ int err)
 {

@@ -1,5 +1,9 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_006 CHANGES:
+         * Try to use core's Socket::getaddrinfo if it exists; as it does on
+           Socket 1.93 (perl 5.13.9).
+
 0.19_005 CHANGES:
          * More MSWin32 fixes
          * Older perls don't have croak_xs_usage; just use croak instead

@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_005';
+our $VERSION = '0.19_006';
 
 use Exporter 'import';
 our @EXPORT = qw(

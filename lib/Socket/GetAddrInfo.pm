@@ -10,13 +10,13 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_005';
+our $VERSION = '0.19_006';
 
 require Exporter;
 our @EXPORT;
 our %EXPORT_TAGS;
 
-foreach my $impl (qw( XS PP )) {
+foreach my $impl (qw( Core XS Emul )) {
    my $class = "Socket::GetAddrInfo::$impl";
    my $file  = "Socket/GetAddrInfo/$impl.pm";
    eval {
@@ -84,8 +84,13 @@ whether the underlying OS will support these functions. If it does not, the
 module will use pure-perl emulations of the functions using the legacy
 resolver functions instead. The emulations support the same interface as the
 real functions, and behave as close as is resonably possible to emulate using
-the legacy resolvers. See L<Socket::GetAddrInfo::PP> for details on the limits
-of this emulation.
+the legacy resolvers. See L<Socket::GetAddrInfo::Emul> for details on the
+limits of this emulation.
+
+As of C<Socket> version 1.93 (as shipped by Perl version 5.13.9, and hopefully
+will be in 5.14), core Perl already supports C<getaddrinfo>. On such a system,
+this module simply uses the functions provided by C<Socket>, and does not need
+to use its own compiled XS, or pure-perl legacy emulation.
 
 =cut
 

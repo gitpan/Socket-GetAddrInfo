@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011 -- leonerd@leonerd.org.uk
 
-package Socket::GetAddrInfo::XS;
+package Socket::GetAddrInfo::Core;
 
 use strict;
 use warnings;
@@ -14,15 +14,19 @@ our $VERSION = '0.19_006';
 package # hide from indexer
   Socket::GetAddrInfo;
 
+BEGIN { die '$Socket::GetAddrInfo::NO_CORE is set' if our $NO_CORE }
+
+use Socket 1.93;
+
 our @EXPORT = qw(
    getaddrinfo
    getnameinfo
 );
 
-die '$Socket::GetAddrInfo::NO_XS is set' if our $NO_XS;
+push @EXPORT, grep { m/^AI_|^NI_|^EAI_/ } @Socket::EXPORT_OK;
 
-require XSLoader;
-XSLoader::load( __PACKAGE__, $Socket::GetAddrInfo::XS::VERSION );
+Socket->import( @EXPORT );
 
 # Keep perl happy; keep Britain tidy
 1;
+

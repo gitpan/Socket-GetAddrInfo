@@ -11,6 +11,9 @@ use_ok( "Socket::GetAddrInfo::Socket6api" );
 if( defined $Socket::GetAddrInfo::PP::VERSION ) {
    diag "Using emulation using legacy resolvers";
 }
+elsif( defined $Socket::GetAddrInfo::XS::VERSION ) {
+   diag "Using native getaddrinfo(3) from XS";
+}
 else {
-   diag "Using native getaddrinfo(3)";
+   diag "Using native getaddrinfo(3) from core";
 }
