@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.19_006';
+our $VERSION = '0.19_007';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer

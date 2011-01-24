@@ -1,6 +1,6 @@
+bin/getaddrinfo
 Build.PL
 Changes
-examples/gai.pl
 lib/Socket/GetAddrInfo.pm
 lib/Socket/GetAddrInfo.xs
 lib/Socket/GetAddrInfo/Core.pm

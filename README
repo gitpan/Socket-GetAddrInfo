@@ -131,7 +131,8 @@ FUNCTIONS
 
     canonname => STRING
             The canonical name for the host if the "AI_CANONNAME" flag was
-            provided, or "undef" otherwise.
+            provided, or "undef" otherwise. This field will only be present
+            on the first returned address.
 
   ( $err, $host, $service ) = getnameinfo( $addr, $flags )
     This function attempts to resolve the given socket address into a pair

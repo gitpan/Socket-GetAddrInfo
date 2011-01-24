@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.19_006';
+our $VERSION = '0.19_007';
 
 require Exporter;
 our @EXPORT;
@@ -226,7 +226,8 @@ The address in a packed string (such as would be returned by pack_sockaddr_in)
 =item canonname => STRING
 
 The canonical name for the host if the C<AI_CANONNAME> flag was provided, or
-C<undef> otherwise.
+C<undef> otherwise. This field will only be present on the first returned
+address.
 
 =back
 

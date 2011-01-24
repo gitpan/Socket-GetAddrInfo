@@ -1,5 +1,11 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_007 CHANGES:
+         * Neatened up examples/gai.pl; turned into real bin/getaddrinfo
+           script that gets installed
+         * More robust Socket-vs-Socket6 implementation
+         * Also include config.h in smoke test diagnostics
+
 0.19_006 CHANGES:
          * Try to use core's Socket::getaddrinfo if it exists; as it does on
            Socket 1.93 (perl 5.13.9).

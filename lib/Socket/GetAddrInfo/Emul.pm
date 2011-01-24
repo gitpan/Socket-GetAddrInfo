@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Emul;
 use strict;
 use warnings;
 
-our $VERSION = '0.19_006';
+our $VERSION = '0.19_007';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -203,9 +203,14 @@ sub getaddrinfo
             socktype  => $socktype,
             protocol  => $protocol,
             addr      => pack_sockaddr_in( $port, $addr ),
-            canonname => $canonname,
+            canonname => undef,
          };
       }
+   }
+
+   # Only supply canonname for the first result
+   if( defined $canonname ) {
+      $ret[0]->{canonname} = $canonname;
    }
 
    return ( _makeerr( 0 ), @ret );
