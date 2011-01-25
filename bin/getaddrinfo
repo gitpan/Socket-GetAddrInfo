@@ -10,7 +10,7 @@ use Socket qw(
    IPPROTO_TCP IPPROTO_UDP IPPROTO_IP
    inet_ntoa unpack_sockaddr_in
 );
-use Socket::GetAddrInfo qw( getaddrinfo :newapi AI_PASSIVE AI_CANONNAME );
+use Socket::GetAddrInfo qw( getaddrinfo AI_PASSIVE AI_CANONNAME );
 
 # Not sure where we'll find IPv6 things
 my $AF_INET6;
@@ -127,6 +127,9 @@ GetOptions(
 $host    = shift @ARGV if @ARGV and !defined $host;
 $service = shift @ARGV if @ARGV and !defined $service;
 
+defined $host or defined $service or
+   usage( 1 );
+
 $host    ||= "";
 $service ||= "0";
 
@@ -162,3 +165,84 @@ foreach my $res ( @res ) {
       getprotocolbynumber($res->{protocol}),
       $address_string;
 }
+
+__END__
+
+=head1 NAME
+
+C<getaddrinfo> - command-line tool to C<getaddrinfo(3)> resolver
+
+=head1 SYNOPSIS
+
+B<getaddrinfo> [I<options...>] I<host> I<service>
+
+=head1 DESCRIPTION
+
+This tool provides a convenient command-line wrapper around the
+C<getaddrinfo(3)> resolver function. It will perform a single lookup and print
+the returned results in a human-readable form. This is mainly useful when
+debugging address resolution problems, because it allows inspection of the
+C<getaddrinfo(3)> behaviour itself, outside of any real program that is trying
+to use it.
+
+=head1 OPTIONS
+
+=over 8
+
+=item --host, -H HOST
+
+Hostname to resolve. If not supplied, will use the first positional argument
+
+=item --service, -S SERVICE
+
+Service name or port number to resolve. If not supplied, will use the second
+positional argument.
+
+=item -4
+
+Restrict to just C<AF_INET> (IPv4) results
+
+=item -6
+
+Restrict to just C<AF_INET6> (IPv6) results
+
+=item --stream
+
+Restrict to just C<SOCK_STREAM> results
+
+=item --dgram 
+
+Restrict to just C<SOCK_DGRAM> results
+
+=item --proto PROTO
+
+Restrict to just results of the given IP protocol
+
+=item --passive
+
+Set the C<AI_PASSIVE> hint; results will used to bind() and listen() rather
+than connect()
+
+=item --canonical
+
+Retrive the canonical name for the requested host
+
+=item --help
+
+Display a help summary and exit
+
+=back
+
+=head1 OUTPUT FORMAT
+
+Each line of output will be given in a form that indicates the four result
+fields of C<ai_family>, C<ai_socktype>, C<ai_protocol> and C<ai_addr>. The
+first three are printed in the form of a C<socket(2)> call, either
+symbolically or numerically, and the latter is printed as a plain string
+following it. For example
+
+ socket(AF_INET , SOCK_STREAM, IPPROTO_TCP) + '127.0.0.1:80'
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>

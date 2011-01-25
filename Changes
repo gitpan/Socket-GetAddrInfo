@@ -1,5 +1,13 @@
 Revision history for Socket-GetAddrInfo
 
+0.19_008 CHANGES:
+         * Added bin/getnameinfo script
+         * Added POD docs to both bin/* scripts to turn them into real
+           manpages
+
+         BUGFIXES:
+         * #include config.h from the right path so it actually works
+
 0.19_007 CHANGES:
          * Neatened up examples/gai.pl; turned into real bin/getaddrinfo
            script that gets installed
