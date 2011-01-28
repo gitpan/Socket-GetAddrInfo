@@ -1,4 +1,5 @@
 bin/getaddrinfo
+bin/getnameinfo
 Build.PL
 Changes
 lib/Socket/GetAddrInfo.pm

@@ -32,7 +32,7 @@ if( $build_xs ) {
       die "OS unsupported - ExtUtils::CChecker too old; need at least 0.06";
 
    my $cc = ExtUtils::CChecker->new(
-      defines_to => "config.h",
+      defines_to => "socket-gai-config.h",
    );
 
    print "\nDetecting if libc supports getaddrinfo()...\n";

@@ -4,7 +4,7 @@
  *  (C) Paul Evans, 2008-2011 -- leonerd@leonerd.org.uk
  */
 
-#include "../../config.h"
+#include "../../socket-gai-config.h"
 
 #include "EXTERN.h"
 #include "perl.h"
