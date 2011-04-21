@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -24,5 +24,4 @@ die '$Socket::GetAddrInfo::NO_XS is set' if our $NO_XS;
 require XSLoader;
 XSLoader::load( __PACKAGE__, $Socket::GetAddrInfo::XS::VERSION );
 
-# Keep perl happy; keep Britain tidy
-1;
+0x55AA;

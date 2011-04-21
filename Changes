@@ -1,5 +1,10 @@
 Revision history for Socket-GetAddrInfo
 
+0.21    BUGFIXES:
+         * Exporter 5.57 is required - this has shipped with perl since 5.8.3,
+           but now explicitly declared for 5.6.2
+         * getservbyport() needs a protocol name on 5.6.2
+
 0.20    CHANGES:
          * Added bin/getaddrinfo and bin/getnameinfo script (replaces previous
            examples/gai.pl)

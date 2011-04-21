@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -27,6 +27,4 @@ push @EXPORT, grep { m/^AI_|^NI_|^EAI_/ } @Socket::EXPORT_OK;
 
 Socket->import( @EXPORT );
 
-# Keep perl happy; keep Britain tidy
-1;
-
+0x55AA;

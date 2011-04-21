@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Exporter 'import';
 our @EXPORT = qw(
@@ -137,11 +137,10 @@ sub getnameinfo
    return ( $host, $service );
 }
 
-# Keep perl happy; keep Britain tidy
-1;
-
-__END__
-
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

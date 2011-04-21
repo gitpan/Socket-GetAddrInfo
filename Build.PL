@@ -4,11 +4,16 @@ use warnings;
 use Module::Build;
 use ExtUtils::CBuilder;
 
-my %requires;
+my %extra_requires;
 my $extra_compiler_flags;
 my $extra_linker_flags;
 
 my $build_xs = 1;
+
+if( $ENV{PERL_SOCKET_GETADDRINFO_NO_BUILD_XS} ) {
+   print "PERL_SOCKET_GETADDRINFO_NO_BUILD_XS specified in environment; disabling XS implementation\n";
+   $build_xs = 0;
+}
 
 # As of Perl 5.13.9, core's Socket now contains getaddrinfo, getnameinfo, and
 # all the associated constants.
@@ -17,7 +22,7 @@ if( eval { require Socket and defined &Socket::getaddrinfo } ) {
    $build_xs = 0;
 
    # Was added in Socket 1.93
-   $requires{"Socket"} = '1.93';
+   $extra_requires{"Socket"} = '1.93';
 }
 
 if( $build_xs and not ExtUtils::CBuilder->new->have_compiler ) {
@@ -112,7 +117,7 @@ int main(int argc, char *argv[]) {
 }
 EOF
 
-   $requires{"XSLoader"} = 0;
+   $extra_requires{"XSLoader"} = 0;
    $extra_compiler_flags = $cc->extra_compiler_flags;
    $extra_linker_flags = $cc->extra_linker_flags;
 }
@@ -120,7 +125,10 @@ EOF
 my $build = Module::Build->new(
    module_name => 'Socket::GetAddrInfo',
    dist_version_from => 'lib/Socket/GetAddrInfo.pm',
-   requires => \%requires,
+   requires => {
+      'Exporter' => '5.57',
+      %extra_requires,
+   },
    configure_requires => {
       'ExtUtils::CBuilder' => 0,
       'ExtUtils::CChecker' => '0.06',

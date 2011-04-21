@@ -145,11 +145,18 @@ FUNCTIONS
     value can be compared against any of the "EAI_*" constants to determine
     what the error is.
 
+BUILDING WITHOUT XS CODE
+    In some environments it may be preferred not to build the XS
+    implementation, leaving a choice only of the core or pure-perl emulation
+    implementations.
+
+     $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL
+
 BUGS
-    *   At the time of writing, there are no test reports from the "MSWin32"
-        platform either PASS or FAIL. I suspect the code will not currently
-        work as it stands on that platform, but it should be fairly easy to
-        fix, as "Socket6" is known to work there. Patches welcomed. :)
+    *   Appears to FAIL on older Darwin machines (e.g. "osvers=8.11.1"). The
+        failure mode occurs in t/02getnameinfo.t and appears to relate to an
+        endian bug; expecting to receive 80 and instead receiving 20480
+        (which is a 16-bit 80 byte-swapped).
 
 SEE ALSO
     *   <http://tools.ietf.org/html/rfc2553> - Basic Socket Interface

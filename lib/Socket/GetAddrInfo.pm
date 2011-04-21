@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 require Exporter;
 our @EXPORT;
@@ -245,10 +245,12 @@ is.
 
 =cut
 
-# Keep perl happy; keep Britain tidy
-1;
+=head1 BUILDING WITHOUT XS CODE
 
-__END__
+In some environments it may be preferred not to build the XS implementation,
+leaving a choice only of the core or pure-perl emulation implementations.
+
+ $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL 
 
 =head1 BUGS
 
@@ -256,10 +258,10 @@ __END__
 
 =item *
 
-At the time of writing, there are no test reports from the C<MSWin32> platform
-either PASS or FAIL. I suspect the code will not currently work as it stands
-on that platform, but it should be fairly easy to fix, as C<Socket6> is known
-to work there. Patches welcomed. :)
+Appears to FAIL on older Darwin machines (e.g. C<osvers=8.11.1>). The failure
+mode occurs in F<t/02getnameinfo.t> and appears to relate to an endian bug;
+expecting to receive C<80> and instead receiving C<20480> (which is a 16-bit
+C<80> byte-swapped).
 
 =back
 
@@ -287,3 +289,7 @@ build fixes.
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

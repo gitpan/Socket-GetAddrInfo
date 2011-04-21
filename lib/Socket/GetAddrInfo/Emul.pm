@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Emul;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -270,7 +270,7 @@ sub getnameinfo
       $service = "$port";
    }
    else {
-      my $protname = $flag_dgram ? "udp" : "";
+      my $protname = $flag_dgram ? "udp" : "tcp";
       $service = getservbyport( $port, $protname );
       if( !defined $service ) {
          $service = "$port";
@@ -280,11 +280,10 @@ sub getnameinfo
    return ( _makeerr( 0 ), $node, $service );
 }
 
-# Keep perl happy; keep Britain tidy
-1;
-
-__END__
-
 =head1 AUTHOR
 
 Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;
