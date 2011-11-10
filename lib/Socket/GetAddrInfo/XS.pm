@@ -8,13 +8,13 @@ package Socket::GetAddrInfo::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.21_001';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
   Socket::GetAddrInfo;
 
-our @EXPORT = qw(
+our @EXPORT_OK = qw(
    getaddrinfo
    getnameinfo
 );

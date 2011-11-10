@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Emul;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.21_001';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -19,7 +19,7 @@ use Carp;
 use Socket;
 use Scalar::Util qw( dualvar );
 
-our @EXPORT;
+our @EXPORT_OK;
 
 =head1 NAME
 
@@ -47,6 +47,9 @@ BEGIN {
        AI_PASSIVE     => 1,
        AI_CANONNAME   => 2,
        AI_NUMERICHOST => 4,
+       AI_V4MAPPED    => 8,
+       AI_ALL         => 16,
+       AI_ADDRCONFIG  => 32,
        # RFC 2553 doesn't define this but Linux does - lets be nice and
        # provide it since we can
        AI_NUMERICSERV => 1024,
@@ -59,16 +62,33 @@ BEGIN {
 
        NI_NUMERICHOST => 1,
        NI_NUMERICSERV => 2,
+       NI_NOFQDN      => 4,
        NI_NAMEREQD    => 8,
        NI_DGRAM       => 16,
+
+       # Constants we don't support. Export them, but croak if anyone tries to
+       # use them
+       AI_IDN                      => 64,
+       AI_CANONIDN                 => 128,
+       AI_IDN_ALLOW_UNASSIGNED     => 256,
+       AI_IDN_USE_STD3_ASCII_RULES => 512,
+       NI_IDN                      => 32,
+       NI_IDN_ALLOW_UNASSIGNED     => 64,
+       NI_IDN_USE_STD3_ASCII_RULES => 128,
+
+       # Error constants we'll never return, so it doesn't matter what value
+       # these have, nor that we don't provide strings for them
+       EAI_SYSTEM   => -11,
+       EAI_BADHINTS => -1000,
+       EAI_PROTOCOL => -1001
    );
 
    require constant;
    constant->import( $_ => $constants{$_} ) for keys %constants;
-   push @EXPORT, $_ for keys %constants;
+   push @EXPORT_OK, $_ for keys %constants;
 }
 
-push @EXPORT, qw(
+push @EXPORT_OK, qw(
    getaddrinfo
    getnameinfo
 );
@@ -107,6 +127,11 @@ result in an error thrown by C<croak>.
 The only supported C<flags> hint values are C<AI_PASSIVE>, C<AI_CANONNAME>,
 C<AI_NUMERICSERV> and C<AI_NUMERICHOST>.
 
+The flags C<AI_V4MAPPED> and C<AI_ALL> are recognised but ignored, as they do
+not apply to C<AF_INET> lookups.  Since this function only returns C<AF_INET>
+addresses, it does not need to probe the system for configured addresses in
+other families, so the C<AI_ADDRCONFIG> flag is also ignored.
+
 Note that C<AI_NUMERICSERV> is an extension not defined by RFC 2553, but is
 provided by most OSes. It is possible (though unlikely) that even the native
 XS implementation does not recognise this constant.
@@ -138,6 +163,14 @@ sub getaddrinfo
    my $flag_canonname   = $flags & AI_CANONNAME;   $flags &= ~AI_CANONNAME;
    my $flag_numerichost = $flags & AI_NUMERICHOST; $flags &= ~AI_NUMERICHOST;
    my $flag_numericserv = $flags & AI_NUMERICSERV; $flags &= ~AI_NUMERICSERV;
+
+   # These constants don't apply to AF_INET-only lookups, so we might as well
+   # just ignore them. For AI_ADDRCONFIG we just presume the host has ability
+   # to talk AF_INET. If not we'd have to return no addresses at all. :)
+   $flags &= ~(AI_V4MAPPED|AI_ALL|AI_ADDRCONFIG);
+
+   $flags & (AI_IDN|AI_CANONIDN|AI_IDN_ALLOW_UNASSIGNED|AI_IDN_USE_STD3_ASCII_RULES) and
+      croak "Socket::GetAddrInfo::Emul::getaddrinfo does not support IDN";
 
    $flags == 0 or return _makeerr( EAI_BADFLAGS );
 
@@ -228,7 +261,7 @@ will be thrown with C<croak>.
 =item *
 
 The only supported C<$flags> values are C<NI_NUMERICHOST>, C<NI_NUMERICSERV>,
-C<NI_NAMEREQD> and C<NI_DGRAM>.
+C<NI_NOFQDN>, C<NI_NAMEREQD> and C<NI_DGRAM>.
 
 =back
 
@@ -248,8 +281,12 @@ sub getnameinfo
 
    my $flag_numerichost = $flags & NI_NUMERICHOST; $flags &= ~NI_NUMERICHOST;
    my $flag_numericserv = $flags & NI_NUMERICSERV; $flags &= ~NI_NUMERICSERV;
+   my $flag_nofqdn      = $flags & NI_NOFQDN;      $flags &= ~NI_NOFQDN;
    my $flag_namereqd    = $flags & NI_NAMEREQD;    $flags &= ~NI_NAMEREQD;
    my $flag_dgram       = $flags & NI_DGRAM;       $flags &= ~NI_DGRAM;
+
+   $flags & (NI_IDN|NI_IDN_ALLOW_UNASSIGNED|NI_IDN_USE_STD3_ASCII_RULES) and
+      croak "Socket::GetAddrInfo::Emul::getnameinfo does not support IDN";
 
    $flags == 0 or return _makeerr( EAI_BADFLAGS );
 
@@ -262,6 +299,11 @@ sub getnameinfo
       if( !defined $node ) {
          return _makeerr( EAI_NONAME ) if $flag_namereqd;
          $node = inet_ntoa( $inetaddr );
+      }
+      elsif( $flag_nofqdn ) {
+         my ( $shortname ) = split m/\./, $node;
+         my ( $fqdn ) = gethostbyname $shortname;
+         $node = $shortname if defined $fqdn and $fqdn eq $node;
       }
    }
 
@@ -279,6 +321,13 @@ sub getnameinfo
 
    return ( _makeerr( 0 ), $node, $service );
 }
+
+=head1 IDN SUPPORT
+
+This pure-perl emulation provides the IDN constants such as C<AI_IDN> and
+C<NI_IDN>, but the C<getaddrinfo> and C<getnameinfo> functions will croak if
+passed these flags. This should allow a program to probe for their support,
+and fall back to some other behaviour instead.
 
 =head1 AUTHOR
 

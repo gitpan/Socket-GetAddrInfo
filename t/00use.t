@@ -1,10 +1,11 @@
 #!/usr/bin/perl -w
 
 use strict;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use_ok( "Socket::GetAddrInfo" );
 use_ok( "Socket::GetAddrInfo::Socket6api" );
+use_ok( "Socket::GetAddrInfo::Strict" );
 
 # Declare which case is being used; can be useful in test reports
 

@@ -1,0 +1,74 @@
+{
+   "abstract" : "RFC 2553's C<getaddrinfo> and C<getnameinfo>\nfunctions.",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Socket-GetAddrInfo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "ExtUtils::CChecker" : "0.06",
+            "Module::Build" : 0,
+            "Module::Build::Compat" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0,
+            "ExtUtils::CChecker" : "0.06",
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "Socket" : "1.93"
+         }
+      }
+   },
+   "provides" : {
+      "Socket::GetAddrInfo" : {
+         "file" : "lib/Socket/GetAddrInfo.pm",
+         "version" : "0.21_001"
+      },
+      "Socket::GetAddrInfo::Core" : {
+         "file" : "lib/Socket/GetAddrInfo/Core.pm",
+         "version" : "0.21_001"
+      },
+      "Socket::GetAddrInfo::Emul" : {
+         "file" : "lib/Socket/GetAddrInfo/Emul.pm",
+         "version" : "0.21_001"
+      },
+      "Socket::GetAddrInfo::Socket6api" : {
+         "file" : "lib/Socket/GetAddrInfo/Socket6api.pm",
+         "version" : "0.21_001"
+      },
+      "Socket::GetAddrInfo::Strict" : {
+         "file" : "lib/Socket/GetAddrInfo/Strict.pm",
+         "version" : "0.21_001"
+      },
+      "Socket::GetAddrInfo::XS" : {
+         "file" : "lib/Socket/GetAddrInfo/XS.pm",
+         "version" : "0.21_001"
+      }
+   },
+   "release_status" : "testing",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.21_001"
+}

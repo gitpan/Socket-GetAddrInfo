@@ -132,6 +132,7 @@ my $build = Module::Build->new(
    configure_requires => {
       'ExtUtils::CBuilder' => 0,
       'ExtUtils::CChecker' => '0.06',
+      'Module::Build' => 0,
    },
    build_requires => {
       'ExtUtils::CBuilder' => 0,

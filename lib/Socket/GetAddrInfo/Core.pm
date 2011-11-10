@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.21_001';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -18,13 +18,13 @@ BEGIN { die '$Socket::GetAddrInfo::NO_CORE is set' if our $NO_CORE }
 
 use Socket 1.93;
 
-our @EXPORT = qw(
+our @EXPORT_OK = qw(
    getaddrinfo
    getnameinfo
 );
 
-push @EXPORT, grep { m/^AI_|^NI_|^EAI_/ } @Socket::EXPORT_OK;
+push @EXPORT_OK, grep { m/^AI_|^NI_|^EAI_/ } @Socket::EXPORT_OK;
 
-Socket->import( @EXPORT );
+Socket->import( @EXPORT_OK );
 
 0x55AA;

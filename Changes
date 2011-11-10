@@ -1,5 +1,14 @@
 Revision history for Socket-GetAddrInfo
 
+0.21_001 CHANGES:
+         * Move most exports into @EXPORT_OK
+         * Provide exception-throwing version of API in
+           Socket::GetAddrInfo::Strict
+         * Wrap lots more flag constants
+            + AI_IDN, AI_V4MAPPED, AI_ALL, AI_ADDRCONFIG
+            + NI_IDN, NI_NOFQDN
+            + EAI_SYSTEM, EAI_BADHINTS, EAI_PROTOCOL
+
 0.21    BUGFIXES:
          * Exporter 5.57 is required - this has shipped with perl since 5.8.3,
            but now explicitly declared for 5.6.2

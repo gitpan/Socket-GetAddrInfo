@@ -12,8 +12,9 @@ build_requires:
 configure_requires:
   ExtUtils::CBuilder: 0
   ExtUtils::CChecker: 0.06
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,22 +23,25 @@ name: Socket-GetAddrInfo
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.21
+    version: 0.21_001
   Socket::GetAddrInfo::Core:
     file: lib/Socket/GetAddrInfo/Core.pm
-    version: 0.21
+    version: 0.21_001
   Socket::GetAddrInfo::Emul:
     file: lib/Socket/GetAddrInfo/Emul.pm
-    version: 0.21
+    version: 0.21_001
   Socket::GetAddrInfo::Socket6api:
     file: lib/Socket/GetAddrInfo/Socket6api.pm
-    version: 0.21
+    version: 0.21_001
+  Socket::GetAddrInfo::Strict:
+    file: lib/Socket/GetAddrInfo/Strict.pm
+    version: 0.21_001
   Socket::GetAddrInfo::XS:
     file: lib/Socket/GetAddrInfo/XS.pm
-    version: 0.21
+    version: 0.21_001
 requires:
   Exporter: 5.57
-  XSLoader: 0
+  Socket: 1.93
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.21
+version: 0.21_001

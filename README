@@ -1,10 +1,10 @@
 NAME
-    "Socket::GetAddrInfo" - RFC 2553's "getaddrinfo" and "getnameinfo"
+    `Socket::GetAddrInfo' - RFC 2553's `getaddrinfo' and `getnameinfo'
     functions.
 
 SYNOPSIS
      use Socket qw( SOCK_STREAM );
-     use Socket::GetAddrInfo qw( :newapi getaddrinfo getnameinfo );
+     use Socket::GetAddrInfo qw( getaddrinfo getnameinfo );
      use IO::Socket;
 
      my $sock;
@@ -31,11 +31,11 @@ SYNOPSIS
      }
 
 DESCRIPTION
-    The RFC 2553 functions "getaddrinfo" and "getnameinfo" provide an
+    The RFC 2553 functions `getaddrinfo' and `getnameinfo' provide an
     abstracted way to convert between a pair of host name/service name and
-    socket addresses, or vice versa. "getaddrinfo" converts names into a set
-    of arguments to pass to the "socket()" and "connect()" syscalls, and
-    "getnameinfo" converts a socket address back into its host name/service
+    socket addresses, or vice versa. `getaddrinfo' converts names into a set
+    of arguments to pass to the `socket()' and `connect()' syscalls, and
+    `getnameinfo' converts a socket address back into its host name/service
     name pair.
 
     These functions provide a useful interface for performing either of
@@ -45,7 +45,7 @@ DESCRIPTION
     calls at the C layer, which means a dilema for authors wishing to write
     forward-compatible code. Either to support these functions, and cause
     the code not to work on older platforms, or stick to the older "legacy"
-    resolvers such as "gethostbyname()", which means the code becomes more
+    resolvers such as `gethostbyname()', which means the code becomes more
     portable.
 
     This module attempts to solve this problem, by detecting at compiletime
@@ -56,21 +56,20 @@ DESCRIPTION
     possible to emulate using the legacy resolvers. See
     Socket::GetAddrInfo::Emul for details on the limits of this emulation.
 
-    As of "Socket" version 1.93 (as shipped by Perl version 5.13.9, and
-    hopefully will be in 5.14), core Perl already supports "getaddrinfo". On
-    such a system, this module simply uses the functions provided by
-    "Socket", and does not need to use its own compiled XS, or pure-perl
+    As of Perl version 5.14.0, Perl already supports `getaddrinfo' in core.
+    On such a system, this module simply uses the functions provided by
+    `Socket', and does not need to use its own compiled XS, or pure-perl
     legacy emulation.
 
 EXPORT TAGS
-    The following tags may be imported by "use Socket::GetAddrInfo qw( :tag
-    )":
+    The following tags may be imported by `use Socket::GetAddrInfo qw( :tag
+    )':
 
-    AI      Imports all of the "AI_*" constants for "getaddrinfo" flags
+    AI      Imports all of the `AI_*' constants for `getaddrinfo' flags
 
-    NI      Imports all of the "NI_*" constants for "getnameinfo" flags
+    NI      Imports all of the `NI_*' constants for `getnameinfo' flags
 
-    EAI     Imports all of the "EAI_*" for error values
+    EAI     Imports all of the `EAI_*' for error values
 
     constants
             Imports all of the above constants
@@ -92,12 +91,12 @@ FUNCTIONS
 
     When given neither name, it generates an error.
 
-    The optional $hints parameter can be passed a HASH reference to indicate
-    how the results are generated. It may contain any of the following four
-    fields:
+    The optional `$hints' parameter can be passed a HASH reference to
+    indicate how the results are generated. It may contain any of the
+    following four fields:
 
     flags => INT
-            A bitfield containing "AI_*" constants
+            A bitfield containing `AI_*' constants
 
     family => INT
             Restrict to only generating addresses in this address family
@@ -108,13 +107,15 @@ FUNCTIONS
     protocol => INT
             Restrict to only generating addresses for this protocol
 
-    Errors are indicated by the $err value returned; which will be non-zero
-    in numeric context, and contain a string error message as a string. The
-    value can be compared against any of the "EAI_*" constants to determine
-    what the error is.
+    Errors are indicated by the `$err' value returned; which will be
+    non-zero in numeric context, and contain a string error message as a
+    string. The value can be compared against any of the `EAI_*' constants
+    to determine what the error is. Rather than explicitly checking, see
+    also Socket::GetAddrInfo::Strict which provides functions that throw
+    exceptions on errors.
 
-    If no error occurs, @res will contain HASH references, each representing
-    one address. It will contain the following five fields:
+    If no error occurs, `@res' will contain HASH references, each
+    representing one address. It will contain the following five fields:
 
     family => INT
             The address family (e.g. AF_INET)
@@ -130,36 +131,39 @@ FUNCTIONS
             pack_sockaddr_in)
 
     canonname => STRING
-            The canonical name for the host if the "AI_CANONNAME" flag was
-            provided, or "undef" otherwise. This field will only be present
+            The canonical name for the host if the `AI_CANONNAME' flag was
+            provided, or `undef' otherwise. This field will only be present
             on the first returned address.
 
   ( $err, $host, $service ) = getnameinfo( $addr, $flags )
     This function attempts to resolve the given socket address into a pair
     of host and service names.
 
-    The optional $flags parameter is a bitfield containing "NI_*" constants.
+    The optional `$flags' parameter is a bitfield containing `NI_*'
+    constants.
 
-    Errors are indicated by the $err value returned; which will be non-zero
-    in numeric context, and contain a string error message as a string. The
-    value can be compared against any of the "EAI_*" constants to determine
-    what the error is.
+    Errors are indicated by the `$err' value returned; which will be
+    non-zero in numeric context, and contain a string error message as a
+    string. The value can be compared against any of the `EAI_*' constants
+    to determine what the error is. Rather than explicitly checking, see
+    also Socket::GetAddrInfo::Strict which provides functions that throw
+    exceptions on errors.
 
 BUILDING WITHOUT XS CODE
     In some environments it may be preferred not to build the XS
     implementation, leaving a choice only of the core or pure-perl emulation
     implementations.
 
-     $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL
+     $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL 
 
 BUGS
-    *   Appears to FAIL on older Darwin machines (e.g. "osvers=8.11.1"). The
+    *   Appears to FAIL on older Darwin machines (e.g. `osvers=8.11.1'). The
         failure mode occurs in t/02getnameinfo.t and appears to relate to an
-        endian bug; expecting to receive 80 and instead receiving 20480
-        (which is a 16-bit 80 byte-swapped).
+        endian bug; expecting to receive `80' and instead receiving `20480'
+        (which is a 16-bit `80' byte-swapped).
 
 SEE ALSO
-    *   <http://tools.ietf.org/html/rfc2553> - Basic Socket Interface
+    *   http://tools.ietf.org/html/rfc2553 - Basic Socket Interface
         Extensions for IPv6
 
 ACKNOWLEDGEMENTS

@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2011 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo::Socket6api;
 
@@ -10,10 +10,10 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21';
+our $VERSION = '0.21_001';
 
 use Exporter 'import';
-our @EXPORT = qw(
+our @EXPORT_OK = qw(
    getaddrinfo
    getnameinfo
 );
@@ -21,8 +21,8 @@ our @EXPORT = qw(
 use Socket::GetAddrInfo ();
 
 # Re-export all the AI_*, EAI_* and NI_* constants
-my @constants = grep m/^(E?A|N)I_/, @Socket::GetAddrInfo::EXPORT;
-push @EXPORT, @constants;
+my @constants = @{ $Socket::GetAddrInfo::EXPORT_TAGS{constants} };
+push @EXPORT_OK, @constants;
 Socket::GetAddrInfo->import( @constants );
 
 =head1 NAME
@@ -69,11 +69,6 @@ This module wraps the functions provided by C<Socket::GetAddrInfo> to provide
 them in an identical API to C<Socket6>. It is intended to stand as a utility
 for existing code written for the C<Socket6> API to use these functions
 instead.
-
-These functions can also be obtained by importing from C<Socket::GetAddrInfo>
-using a special tag:
-
- use Socket::GetAddrInfo qw( :Socket6api getaddrinfo );
 
 =cut
 

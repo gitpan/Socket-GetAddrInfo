@@ -10,10 +10,10 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21';
+our $VERSION = '0.21_001';
 
 require Exporter;
-our @EXPORT;
+our @EXPORT_OK;
 our %EXPORT_TAGS;
 
 foreach my $impl (qw( Core XS Emul )) {
@@ -36,7 +36,7 @@ functions.
 =head1 SYNOPSIS
 
  use Socket qw( SOCK_STREAM );
- use Socket::GetAddrInfo qw( :newapi getaddrinfo getnameinfo );
+ use Socket::GetAddrInfo qw( getaddrinfo getnameinfo );
  use IO::Socket;
 
  my $sock;
@@ -87,10 +87,9 @@ real functions, and behave as close as is resonably possible to emulate using
 the legacy resolvers. See L<Socket::GetAddrInfo::Emul> for details on the
 limits of this emulation.
 
-As of C<Socket> version 1.93 (as shipped by Perl version 5.13.9, and hopefully
-will be in 5.14), core Perl already supports C<getaddrinfo>. On such a system,
-this module simply uses the functions provided by C<Socket>, and does not need
-to use its own compiled XS, or pure-perl legacy emulation.
+As of Perl version 5.14.0, Perl already supports C<getaddrinfo> in core. On
+such a system, this module simply uses the functions provided by C<Socket>,
+and does not need to use its own compiled XS, or pure-perl legacy emulation.
 
 =cut
 
@@ -120,9 +119,9 @@ Imports all of the above constants
 
 =cut
 
-$EXPORT_TAGS{AI}  = [ grep m/^AI_/,  @EXPORT ];
-$EXPORT_TAGS{NI}  = [ grep m/^NI_/,  @EXPORT ];
-$EXPORT_TAGS{EAI} = [ grep m/^EAI_/, @EXPORT ];
+$EXPORT_TAGS{AI}  = [ grep m/^AI_/,  @EXPORT_OK ];
+$EXPORT_TAGS{NI}  = [ grep m/^NI_/,  @EXPORT_OK ];
+$EXPORT_TAGS{EAI} = [ grep m/^EAI_/, @EXPORT_OK ];
 
 $EXPORT_TAGS{constants} = [ map @{$EXPORT_TAGS{$_}}, qw( AI NI EAI ) ];
 
@@ -200,7 +199,8 @@ Restrict to only generating addresses for this protocol
 Errors are indicated by the C<$err> value returned; which will be non-zero in
 numeric context, and contain a string error message as a string. The value can
 be compared against any of the C<EAI_*> constants to determine what the error
-is.
+is. Rather than explicitly checking, see also L<Socket::GetAddrInfo::Strict>
+which provides functions that throw exceptions on errors.
 
 If no error occurs, C<@res> will contain HASH references, each representing
 one address. It will contain the following five fields:
@@ -241,7 +241,8 @@ The optional C<$flags> parameter is a bitfield containing C<NI_*> constants.
 Errors are indicated by the C<$err> value returned; which will be non-zero in
 numeric context, and contain a string error message as a string. The value can
 be compared against any of the C<EAI_*> constants to determine what the error
-is.
+is. Rather than explicitly checking, see also L<Socket::GetAddrInfo::Strict>
+which provides functions that throw exceptions on errors.
 
 =cut
 
