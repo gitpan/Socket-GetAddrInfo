@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21_001';
+our $VERSION = '0.21_002';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -90,7 +90,7 @@ sub getaddrinfo
    return @res;
 }
 
-=head2 ( $host, $service ) = getnameinfo( $addr, $flags )
+=head2 ( $host, $service ) = getnameinfo( $addr, $flags, $xflags )
 
 After a successful lookup, returns the host and service name, as
 documented in L<Socket::GetAddrInfo>. If the lookup fails, an exception

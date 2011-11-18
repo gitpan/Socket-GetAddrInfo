@@ -1,5 +1,10 @@
 Revision history for Socket-GetAddrInfo
 
+0.21_002 CHANGES:
+         * Implement NIx_NOHOST and NIx_NOSERV; flags to getnameinfo to
+           request only one of host or service name
+         * No longer supports API import tags
+
 0.21_001 CHANGES:
          * Move most exports into @EXPORT_OK
          * Provide exception-throwing version of API in

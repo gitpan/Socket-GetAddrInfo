@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.21_001';
+our $VERSION = '0.21_002';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -17,13 +17,14 @@ package # hide from indexer
 BEGIN { die '$Socket::GetAddrInfo::NO_CORE is set' if our $NO_CORE }
 
 use Socket 1.93;
+defined &Socket::NIx_NOHOST or die "Core Socket is missing NIx_NOHOST";
 
 our @EXPORT_OK = qw(
    getaddrinfo
    getnameinfo
 );
 
-push @EXPORT_OK, grep { m/^AI_|^NI_|^EAI_/ } @Socket::EXPORT_OK;
+push @EXPORT_OK, grep { m/^AI_|^NI(?:x)?_|^EAI_/ } @Socket::EXPORT_OK;
 
 Socket->import( @EXPORT_OK );
 

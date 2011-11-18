@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Emul;
 use strict;
 use warnings;
 
-our $VERSION = '0.21_001';
+our $VERSION = '0.21_002';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -65,6 +65,10 @@ BEGIN {
        NI_NOFQDN      => 4,
        NI_NAMEREQD    => 8,
        NI_DGRAM       => 16,
+
+       # These are not gni() constants; they're extensions for the perl API /*
+       NIx_NOHOST     => 1,
+       NIx_NOSERV     => 2,
 
        # Constants we don't support. Export them, but croak if anyone tries to
        # use them
@@ -269,7 +273,7 @@ C<NI_NOFQDN>, C<NI_NAMEREQD> and C<NI_DGRAM>.
 
 sub getnameinfo
 {
-   my ( $addr, $flags ) = @_;
+   my ( $addr, $flags, $xflags ) = @_;
 
    my ( $port, $inetaddr );
    eval { ( $port, $inetaddr ) = unpack_sockaddr_in( $addr ) }
@@ -290,8 +294,13 @@ sub getnameinfo
 
    $flags == 0 or return _makeerr( EAI_BADFLAGS );
 
+   $xflags ||= 0;
+
    my $node;
-   if( $flag_numerichost ) {
+   if( $xflags & NIx_NOHOST ) {
+      $node = undef;
+   }
+   elsif( $flag_numerichost ) {
       $node = inet_ntoa( $inetaddr );
    }
    else {
@@ -308,7 +317,10 @@ sub getnameinfo
    }
 
    my $service;
-   if( $flag_numericserv ) {
+   if( $xflags & NIx_NOSERV ) {
+      $service = undef;
+   }
+   elsif( $flag_numericserv ) {
       $service = "$port";
    }
    else {

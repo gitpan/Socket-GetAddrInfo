@@ -34,34 +34,34 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
-            "Socket" : "1.93"
+            "XSLoader" : 0
          }
       }
    },
    "provides" : {
       "Socket::GetAddrInfo" : {
          "file" : "lib/Socket/GetAddrInfo.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       },
       "Socket::GetAddrInfo::Core" : {
          "file" : "lib/Socket/GetAddrInfo/Core.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       },
       "Socket::GetAddrInfo::Emul" : {
          "file" : "lib/Socket/GetAddrInfo/Emul.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       },
       "Socket::GetAddrInfo::Socket6api" : {
          "file" : "lib/Socket/GetAddrInfo/Socket6api.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       },
       "Socket::GetAddrInfo::Strict" : {
          "file" : "lib/Socket/GetAddrInfo/Strict.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       },
       "Socket::GetAddrInfo::XS" : {
          "file" : "lib/Socket/GetAddrInfo/XS.pm",
-         "version" : "0.21_001"
+         "version" : "0.21_002"
       }
    },
    "release_status" : "testing",
@@ -70,5 +70,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.21_001"
+   "version" : "0.21_002"
 }

@@ -9,7 +9,7 @@ use_ok( "Socket::GetAddrInfo::Strict" );
 
 # Declare which case is being used; can be useful in test reports
 
-if( defined $Socket::GetAddrInfo::PP::VERSION ) {
+if( defined $Socket::GetAddrInfo::Emul::VERSION ) {
    diag "Using emulation using legacy resolvers";
 }
 elsif( defined $Socket::GetAddrInfo::XS::VERSION ) {

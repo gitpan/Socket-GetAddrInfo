@@ -135,12 +135,17 @@ FUNCTIONS
             provided, or `undef' otherwise. This field will only be present
             on the first returned address.
 
-  ( $err, $host, $service ) = getnameinfo( $addr, $flags )
+  ( $err, $host, $service ) = getnameinfo( $addr, $flags, $xflags )
     This function attempts to resolve the given socket address into a pair
     of host and service names.
 
     The optional `$flags' parameter is a bitfield containing `NI_*'
     constants.
+
+    The optional `$xflags' parameter is a bitfield containing `NIx_*'
+    constants. The two constants are `NIx_NOHOST' and `NIx_NOSERV'. These
+    are a Perl-level extension of the API to request looking up only the
+    service name or host name respectively, when only one is required.
 
     Errors are indicated by the `$err' value returned; which will be
     non-zero in numeric context, and contain a string error message as a

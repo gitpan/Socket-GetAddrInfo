@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21_001';
+our $VERSION = '0.21_002';
 
 require Exporter;
 our @EXPORT_OK;
@@ -119,9 +119,9 @@ Imports all of the above constants
 
 =cut
 
-$EXPORT_TAGS{AI}  = [ grep m/^AI_/,  @EXPORT_OK ];
-$EXPORT_TAGS{NI}  = [ grep m/^NI_/,  @EXPORT_OK ];
-$EXPORT_TAGS{EAI} = [ grep m/^EAI_/, @EXPORT_OK ];
+$EXPORT_TAGS{AI}  = [ grep m/^AI_/,       @EXPORT_OK ];
+$EXPORT_TAGS{NI}  = [ grep m/^NI(?:x)?_/, @EXPORT_OK ];
+$EXPORT_TAGS{EAI} = [ grep m/^EAI_/,      @EXPORT_OK ];
 
 $EXPORT_TAGS{constants} = [ map @{$EXPORT_TAGS{$_}}, qw( AI NI EAI ) ];
 
@@ -130,22 +130,8 @@ sub import
    my $class = shift;
    my %symbols = map { $_ => 1 } @_;
 
-   my $api = "new";
-   delete $symbols{':newapi'}; # legacy
-   $api = "Socket6" if delete $symbols{':Socket6api'};
-
-   if( $api eq "Socket6" and
-       $symbols{getaddrinfo} || $symbols{getnameinfo} ) {
-
-      my $callerpkg = caller;
-      require Socket::GetAddrInfo::Socket6api;
-
-      no strict 'refs';
-      *{"${callerpkg}::getaddrinfo"} = \&Socket::GetAddrInfo::Socket6api::getaddrinfo if delete $symbols{getaddrinfo};
-      *{"${callerpkg}::getnameinfo"} = \&Socket::GetAddrInfo::Socket6api::getnameinfo if delete $symbols{getnameinfo};
-   }
-
-   return unless keys %symbols;
+   $symbols{':newapi'} and croak ":newapi tag is no longer supported by Socket::GetAddrInfo; just 'use' it directly";
+   $symbols{':Socket6api'} and croak ":Socket6api tag is no longer supported by Socket::GetAddrInfo; use Socket::GetAddrInfo::Socket6api instead";
 
    local $Exporter::ExportLevel = $Exporter::ExportLevel + 1;
    Exporter::import( $class, keys %symbols );
@@ -231,12 +217,17 @@ address.
 
 =back
 
-=head2 ( $err, $host, $service ) = getnameinfo( $addr, $flags )
+=head2 ( $err, $host, $service ) = getnameinfo( $addr, $flags, $xflags )
 
 This function attempts to resolve the given socket address into a pair of host
 and service names.
 
 The optional C<$flags> parameter is a bitfield containing C<NI_*> constants.
+
+The optional C<$xflags> parameter is a bitfield containing C<NIx_*> constants.
+The two constants are C<NIx_NOHOST> and C<NIx_NOSERV>. These are a Perl-level
+extension of the API to request looking up only the service name or host name
+respectively, when only one is required.
 
 Errors are indicated by the C<$err> value returned; which will be non-zero in
 numeric context, and contain a string error message as a string. The value can

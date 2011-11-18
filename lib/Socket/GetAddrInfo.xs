@@ -48,6 +48,10 @@
 # include <netdb.h>
 #endif
 
+/* These are not gni() constants; they're extensions for the perl API */
+#define NIx_NOHOST   (1 << 0)
+#define NIx_NOSERV   (1 << 1)
+
 static SV *err_to_SV(pTHX_ int err)
 {
   SV *ret = sv_newmortal();
@@ -142,6 +146,9 @@ static void setup_constants(void)
 #ifdef NI_IDN_USE_STD3_ASCII_RULES
   DO_CONSTANT(NI_IDN_USE_STD3_ASCII_RULES)
 #endif
+
+  DO_CONSTANT(NIx_NOHOST)
+  DO_CONSTANT(NIx_NOSERV)
 }
 
 static void xs_getaddrinfo(pTHX_ CV *cv)
@@ -256,6 +263,7 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 
     SV  *addr;
     int  flags;
+    int  xflags;
 
     char host[1024];
     char serv[256];
@@ -263,8 +271,10 @@ static void xs_getnameinfo(pTHX_ CV *cv)
     STRLEN addr_len;
     int err;
 
-    if(items < 1 || items > 2)
-      croak("Usage: Socket::GetAddrInfo(addr, flags=0)");
+    int want_host, want_serv;
+
+    if(items < 1 || items > 3)
+      croak("Usage: Socket::GetAddrInfo(addr, flags=0, xflags=0)");
 
     SP -= items;
 
@@ -274,6 +284,14 @@ static void xs_getnameinfo(pTHX_ CV *cv)
       flags = 0;
     else
       flags = SvIV(ST(1));
+
+    if(items < 3)
+      xflags = 0;
+    else
+      xflags = SvIV(ST(2));
+
+    want_host = !(xflags & NIx_NOHOST);
+    want_serv = !(xflags & NIx_NOSERV);
 
     if(!SvPOK(addr))
       croak("addr is not a string");
@@ -289,8 +307,8 @@ static void xs_getnameinfo(pTHX_ CV *cv)
 #endif
 
     err = getnameinfo((struct sockaddr *)sa, addr_len,
-      host, sizeof(host),
-      serv, sizeof(serv),
+      want_host ? host : NULL, want_host ? sizeof(host) : 0,
+      want_serv ? serv : NULL, want_serv ? sizeof(serv) : 0,
       flags);
 
     Safefree(sa);
@@ -300,8 +318,8 @@ static void xs_getnameinfo(pTHX_ CV *cv)
     if(err)
       XSRETURN(1);
 
-    XPUSHs(sv_2mortal(newSVpv(host, 0)));
-    XPUSHs(sv_2mortal(newSVpv(serv, 0)));
+    XPUSHs(want_host ? sv_2mortal(newSVpv(host, 0)) : &PL_sv_undef);
+    XPUSHs(want_serv ? sv_2mortal(newSVpv(serv, 0)) : &PL_sv_undef);
 
     XSRETURN(3);
 }

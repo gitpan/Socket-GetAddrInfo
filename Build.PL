@@ -17,12 +17,12 @@ if( $ENV{PERL_SOCKET_GETADDRINFO_NO_BUILD_XS} ) {
 
 # As of Perl 5.13.9, core's Socket now contains getaddrinfo, getnameinfo, and
 # all the associated constants.
-if( eval { require Socket and defined &Socket::getaddrinfo } ) {
+# NIx_NOHOST added here first, will be backported to core eventually.
+if( eval { require Socket and defined &Socket::getaddrinfo and defined &Socket::NIx_NOHOST } ) {
    print "&Socket::getaddrinfo exists so no need to build XS implementation\n";
    $build_xs = 0;
 
-   # Was added in Socket 1.93
-   $extra_requires{"Socket"} = '1.93';
+   $extra_requires{"Socket"} = $Socket::VERSION;
 }
 
 if( $build_xs and not ExtUtils::CBuilder->new->have_compiler ) {
