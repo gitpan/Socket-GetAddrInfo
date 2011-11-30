@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21_002';
+our $VERSION = '0.21_003';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -59,9 +59,9 @@ which throw exceptions
 
 =head1 DESCRIPTION
 
-L<Socket::GetAddrInfo> provides the RFC 2553-specified functions of
-C<getaddrinfo> and C<getnameinfo>, which return lists whose first element is
-error value, or false indicating no error occured.
+L<Socket::GetAddrInfo> provides the functions of C<getaddrinfo> and
+C<getnameinfo>, which return lists whose first element is error value, or
+false indicating no error occured.
 
 This module wraps the functions provided by C<Socket::GetAddrInfo> to check
 this error value, and throw an exception (using C<die>) if an error occured.

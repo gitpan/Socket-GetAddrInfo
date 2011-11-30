@@ -1,5 +1,10 @@
 Revision history for Socket-GetAddrInfo
 
+0.21_003 CHANGES:
+         * Make more of the AI_* and NI_* flags #ifdef-guarded, for OSes that
+           don't provide them
+         * Docs improvements - added some code examples
+
 0.21_002 CHANGES:
          * Implement NIx_NOHOST and NIx_NOSERV; flags to getnameinfo to
            request only one of host or service name

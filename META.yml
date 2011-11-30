@@ -1,5 +1,5 @@
 ---
-abstract: "RFC 2553's C<getaddrinfo> and C<getnameinfo>\nfunctions."
+abstract: 'address-family independent name resolving functions'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
@@ -23,25 +23,25 @@ name: Socket-GetAddrInfo
 provides:
   Socket::GetAddrInfo:
     file: lib/Socket/GetAddrInfo.pm
-    version: 0.21_002
+    version: 0.21_003
   Socket::GetAddrInfo::Core:
     file: lib/Socket/GetAddrInfo/Core.pm
-    version: 0.21_002
+    version: 0.21_003
   Socket::GetAddrInfo::Emul:
     file: lib/Socket/GetAddrInfo/Emul.pm
-    version: 0.21_002
+    version: 0.21_003
   Socket::GetAddrInfo::Socket6api:
     file: lib/Socket/GetAddrInfo/Socket6api.pm
-    version: 0.21_002
+    version: 0.21_003
   Socket::GetAddrInfo::Strict:
     file: lib/Socket/GetAddrInfo/Strict.pm
-    version: 0.21_002
+    version: 0.21_003
   Socket::GetAddrInfo::XS:
     file: lib/Socket/GetAddrInfo/XS.pm
-    version: 0.21_002
+    version: 0.21_003
 requires:
   Exporter: 5.57
   XSLoader: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.21_002
+version: 0.21_003

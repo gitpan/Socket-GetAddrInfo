@@ -8,7 +8,7 @@ package Socket::GetAddrInfo::Emul;
 use strict;
 use warnings;
 
-our $VERSION = '0.21_002';
+our $VERSION = '0.21_003';
 
 # Load the actual code into Socket::GetAddrInfo
 package # hide from indexer
@@ -29,13 +29,13 @@ C<getnameinfo> using IPv4-only legacy resolvers
 =head1 DESCRIPTION
 
 C<Socket::GetAddrInfo> attempts to provide the C<getaddrinfo> and
-C<getnameinfo> functions as specified by RFC 2553. Ideally this is done by
-some XS code that calls the real functions in F<libc>. If for some reason this
-cannot be done; either there is no C compiler, or F<libc> does not provide
-these functions, then they will be emulated using the legacy resolvers
-C<gethostbyname>, etc... These emulations are not a complete replacement of
-the real functions, because they only support IPv4 (the C<AF_INET> socket
-family). In this case, the following restrictions will apply.
+C<getnameinfo> functions by some XS code that calls the real functions in
+F<libc>. If for some reason this cannot be done; either there is no C
+compiler, or F<libc> does not provide these functions, then they will be
+emulated using the legacy resolvers C<gethostbyname>, etc... These emulations
+are not a complete replacement of the real functions, because they only
+support IPv4 (the C<AF_INET> socket family). In this case, the following
+restrictions will apply.
 
 =cut
 

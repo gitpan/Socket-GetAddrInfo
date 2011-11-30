@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21_002';
+our $VERSION = '0.21_003';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -60,10 +60,10 @@ using L<Socket6> API
 
 =head1 DESCRIPTION
 
-L<Socket::GetAddrInfo> provides the RFC 2553-specified functions of
-C<getaddrinfo> and C<getnameinfo>, using a convenient interface where hints
-and address structures are represented as hashes. L<Socket6> also provides
-these functions, in a form taking and returning flat lists of values.
+L<Socket::GetAddrInfo> provides the functions of C<getaddrinfo> and
+C<getnameinfo> using a convenient interface where hints and address structures
+are represented as hashes. L<Socket6> also provides these functions, in a form
+taking and returning flat lists of values.
 
 This module wraps the functions provided by C<Socket::GetAddrInfo> to provide
 them in an identical API to C<Socket6>. It is intended to stand as a utility
