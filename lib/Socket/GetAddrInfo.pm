@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2007-2011 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2007-2012 -- leonerd@leonerd.org.uk
 
 package Socket::GetAddrInfo;
 
@@ -10,7 +10,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.21_003';
+our $VERSION = '0.22';
 
 require Exporter;
 our @EXPORT_OK;
@@ -91,6 +91,11 @@ limits of this emulation.
 As of Perl version 5.14.0, Perl already supports C<getaddrinfo> in core. On
 such a system, this module simply uses the functions provided by C<Socket>,
 and does not need to use its own compiled XS, or pure-perl legacy emulation.
+
+As C<Socket> in core now provides all the functions also provided by this
+module, it is likely this may be the last released version of this module. And
+code currently using this module would be advised to switch to using core
+C<Socket> instead.
 
 =cut
 
@@ -396,6 +401,10 @@ and C<inet_ntoa>.
 
 In some environments it may be preferred not to build the XS implementation,
 leaving a choice only of the core or pure-perl emulation implementations.
+
+ $ perl Build.PL --pp
+
+or
 
  $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL 
 

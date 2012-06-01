@@ -10,6 +10,8 @@ my $extra_linker_flags;
 
 my $build_xs = 1;
 
+grep { $_ eq "--pp" } @ARGV and $build_xs = 0;
+
 if( $ENV{PERL_SOCKET_GETADDRINFO_NO_BUILD_XS} ) {
    print "PERL_SOCKET_GETADDRINFO_NO_BUILD_XS specified in environment; disabling XS implementation\n";
    $build_xs = 0;
@@ -17,8 +19,7 @@ if( $ENV{PERL_SOCKET_GETADDRINFO_NO_BUILD_XS} ) {
 
 # As of Perl 5.13.9, core's Socket now contains getaddrinfo, getnameinfo, and
 # all the associated constants.
-# NIx_NOHOST added here first, will be backported to core eventually.
-if( eval { require Socket and defined &Socket::getaddrinfo and defined &Socket::NIx_NOHOST } ) {
+if( $build_xs and eval { require Socket and defined &Socket::getaddrinfo and defined &Socket::NIx_NOHOST } ) {
    print "&Socket::getaddrinfo exists so no need to build XS implementation\n";
    $build_xs = 0;
 

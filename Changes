@@ -1,16 +1,6 @@
 Revision history for Socket-GetAddrInfo
 
-0.21_003 CHANGES:
-         * Make more of the AI_* and NI_* flags #ifdef-guarded, for OSes that
-           don't provide them
-         * Docs improvements - added some code examples
-
-0.21_002 CHANGES:
-         * Implement NIx_NOHOST and NIx_NOSERV; flags to getnameinfo to
-           request only one of host or service name
-         * No longer supports API import tags
-
-0.21_001 CHANGES:
+0.22    CHANGES:
          * Move most exports into @EXPORT_OK
          * Provide exception-throwing version of API in
            Socket::GetAddrInfo::Strict
@@ -18,6 +8,10 @@ Revision history for Socket-GetAddrInfo
             + AI_IDN, AI_V4MAPPED, AI_ALL, AI_ADDRCONFIG
             + NI_IDN, NI_NOFQDN
             + EAI_SYSTEM, EAI_BADHINTS, EAI_PROTOCOL
+         * Implement NIx_NOHOST and NIx_NOSERV; flags to getnameinfo to
+           request only one of host or service name
+         * No longer supports API import tags
+         * Docs improvements - added some code examples
 
 0.21    BUGFIXES:
          * Exporter 5.57 is required - this has shipped with perl since 5.8.3,

@@ -63,6 +63,11 @@ DESCRIPTION
     `Socket', and does not need to use its own compiled XS, or pure-perl
     legacy emulation.
 
+    As `Socket' in core now provides all the functions also provided by this
+    module, it is likely this may be the last released version of this
+    module. And code currently using this module would be advised to switch
+    to using core `Socket' instead.
+
 EXPORT TAGS
     The following tags may be imported by `use Socket::GetAddrInfo qw( :tag
     )':
@@ -290,6 +295,10 @@ BUILDING WITHOUT XS CODE
     In some environments it may be preferred not to build the XS
     implementation, leaving a choice only of the core or pure-perl emulation
     implementations.
+
+     $ perl Build.PL --pp
+
+    or
 
      $ PERL_SOCKET_GETADDRINFO_NO_BUILD_XS=1 perl Build.PL 
 
